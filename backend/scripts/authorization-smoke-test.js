@@ -1,0 +1,20 @@
+require('dotenv').config({ path: require('path').join(__dirname, '..', '.env') });
+const app = require('../server'); const pool = require('../config/db');
+const request = async (base, path, expected, headers) => { const response = await fetch(`${base}${path}`, { headers }); if (response.status !== expected) throw new Error(`GET ${path} returned ${response.status}; expected ${expected}`); };
+const login = async (base, email, password) => { const response = await fetch(`${base}/api/auth/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) }); if (!response.ok) throw new Error(`Login failed for ${email}`); return response.json(); };
+const run = async () => { const server = await app.listen(0); const base = `http://127.0.0.1:${server.address().port}`; try {
+  await request(base, '/api/health', 200);
+  const protectedPaths = ['/api/auth/me', '/api/cadets', '/api/subjects', '/api/attendance/sessions', '/api/attendance/my', '/api/academics/assessments', '/api/academics/marks/my', '/api/physical/my', '/api/notices', '/api/notes', '/api/exams', '/api/leaves', '/api/results/me', '/api/reports/overview', '/api/audit-logs', '/api/settings', '/api/notifications'];
+  for (const path of protectedPaths) await request(base, path, 401);
+  const cadet = await login(base, process.env.TEST_CADET_EMAIL || 'cadet@cadet.com', process.env.TEST_CADET_PASSWORD || 'password123');
+  const admin = await login(base, process.env.TEST_ADMIN_EMAIL || 'admin@admin.com', process.env.TEST_ADMIN_PASSWORD || 'password123');
+  const commander = await login(base, process.env.TEST_COMMANDER_EMAIL || 'commander@commander.com', process.env.TEST_COMMANDER_PASSWORD || 'password123');
+  const cadetHeaders = { Authorization: `Bearer ${cadet.token}` }; const adminHeaders = { Authorization: `Bearer ${admin.token}` }; const commanderHeaders = { Authorization: `Bearer ${commander.token}` };
+  for (const path of ['/api/auth/me', '/api/subjects', '/api/attendance/my', `/api/cadets/${cadet.id}`, `/api/cadets/${cadet.id}/subjects`, '/api/academics/marks/my', '/api/physical/my', '/api/notices', '/api/notes', '/api/leaves', '/api/results/me', '/api/settings', '/api/notifications']) await request(base, path, 200, cadetHeaders);
+  for (const path of ['/api/cadets', `/api/cadets/${admin.id}`, `/api/cadets/${admin.id}/subjects`, '/api/admins', '/api/reports/overview', '/api/audit-logs', `/api/attendance/cadet/${admin.id}`, `/api/academics/marks/cadet/${admin.id}`]) await request(base, path, 403, cadetHeaders);
+  for (const path of ['/api/cadets', '/api/subjects', '/api/attendance/sessions', '/api/academics/assessments', '/api/notices', '/api/notes', '/api/exams', '/api/leaves', '/api/reports/overview', '/api/audit-logs', '/api/settings', '/api/notifications']) await request(base, path, 200, adminHeaders);
+  await request(base, '/api/admins', 403, adminHeaders);
+  for (const path of ['/api/cadets', '/api/admins', '/api/subjects', '/api/attendance/sessions', '/api/academics/assessments', '/api/notices', '/api/notes', '/api/exams', '/api/leaves', '/api/reports/overview', '/api/audit-logs', '/api/settings', '/api/notifications']) await request(base, path, 200, commanderHeaders);
+  console.log('Authorization route matrix passed.');
+} finally { await new Promise((resolve) => server.close(resolve)); await pool.end(); } };
+run().catch((error) => { console.error(`Authorization tests failed: ${error.message}`); process.exitCode = 1; });

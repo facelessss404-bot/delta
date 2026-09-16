@@ -1,0 +1,1 @@
+const express=require('express');const {protect,authorize}=require('../middleware/authMiddleware');const {getAttendance,markAttendance}=require('../controllers/attendanceController');const router=express.Router();router.get('/',protect,getAttendance);router.post('/',protect,authorize('admin','commander'),markAttendance);module.exports=router;

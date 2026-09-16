@@ -1,0 +1,184 @@
+I have already generated and developed this project. Do NOT rebuild it from scratch and do NOT change my current technology stack.
+
+My main goal now is to understand the CURRENT project by actually running it.
+
+First inspect the existing project and determine the REAL current architecture from the source code and configuration. Do not assume MongoDB, Neon, Firebase, or any other database. Check the actual code, environment variables, database client, models/schema, API routes, and frontend API calls.
+
+Then do the following:
+
+1. RUN THE PROJECT
+
+* Start the backend using the existing project scripts.
+* Start the frontend.
+* Verify the application opens successfully.
+* Tell me the frontend URL and backend/API URL.
+* Check the backend health/API connection.
+* Report any startup errors clearly.
+
+2. GIVE ME A SIMPLE PREVIEW
+   After running the application, explain:
+
+* What page opens first
+* How login works
+* What roles exist
+* What each role sees
+* Which pages/features are currently available
+* Which features are actually working
+* Which features are only UI/placeholders
+* Which features are missing or broken
+
+Do not claim something is working just because a button/page exists.
+
+3. EXPLAIN THE PROJECT FLOW
+   For every important feature, explain in this simple format:
+
+USER
+→ FRONTEND PAGE
+→ API REQUEST
+→ BACKEND
+→ DATABASE
+→ RESULT SHOWN IN UI
+
+For example:
+
+Admin
+→ Attendance Page
+→ API
+→ Backend
+→ Database
+→ Attendance saved
+→ Student sees updated attendance
+
+4. CHECK THE DATABASE
+   Identify the ACTUAL database being used by this project.
+
+Tell me:
+
+* Database type
+* Database name
+* Connection method
+* Where the connection is configured
+* Which tables/collections/models exist
+* What data is stored in each one
+* Which feature creates each record
+* Which feature reads each record
+* How records are related
+
+If the project uses Neon/PostgreSQL, explain the actual tables and relationships.
+If it uses MongoDB, explain the actual collections and relationships.
+Do NOT assume one.
+
+5. SHOW ME HOW TO TEST EACH FEATURE
+   Create a very simple feature-by-feature testing guide.
+
+For each feature tell me:
+
+WHERE TO GO
+→ WHAT TO CLICK
+→ WHAT TO ENTER
+→ WHAT SHOULD HAPPEN
+→ WHAT DATABASE RECORD SHOULD CHANGE
+
+Cover the currently implemented features such as:
+
+* Login
+* Admin/Staff access
+* Student access
+* Dashboard
+* Attendance
+* Subjects/classes
+* Marks/academics
+* Physical/video upload if implemented
+* Reports
+* Settings
+* Logout
+
+Only include features that actually exist in the current code, and clearly mark missing ones.
+
+6. TEST ALL ROLES
+   Use the actual role names found in the code.
+
+For each role explain:
+
+ROLE
+→ LOGIN
+→ DASHBOARD
+→ AVAILABLE FEATURES
+→ RESTRICTED FEATURES
+
+Also test whether authorization is enforced by the backend, not just hidden in the frontend.
+
+7. TRACE ONE COMPLETE REAL EXAMPLE
+   Take one real workflow from the current project, for example attendance.
+
+Show:
+
+Step 1: User clicks...
+Step 2: Frontend calls...
+Step 3: Backend route...
+Step 4: Controller/service...
+Step 5: Database table/model...
+Step 6: Data is stored...
+Step 7: Response comes back...
+Step 8: UI updates...
+
+Do the same briefly for marks and video upload if those features exist.
+
+8. FIND WHY SOMETHING DOES NOT WORK
+   For every broken or incomplete feature, explain:
+
+* What is missing
+* Where the problem is
+* Frontend problem or backend problem
+* API mismatch or database problem
+* Environment/configuration problem
+* What needs to be changed
+
+Do not blindly rewrite the project.
+
+9. CREATE A SMALL OWNER GUIDE
+   Create a file:
+
+PROJECT_USAGE_GUIDE.md
+
+Keep it easy for a new project owner to understand.
+
+It should answer:
+
+* What is this project?
+* How do I start it?
+* Where do I open it?
+* How do I log in?
+* How do Admin/Staff/Student roles work?
+* Where do I test each feature?
+* What happens behind the scenes?
+* Where is data stored?
+* How do I see the data in the database?
+* What is working?
+* What is not working?
+* What still needs to be developed?
+
+10. FINAL REPORT
+    At the end, give me a simple report:
+
+PROJECT STATUS:
+WORKING:
+PARTIALLY WORKING:
+NOT IMPLEMENTED:
+BROKEN:
+DATABASE:
+FRONTEND:
+BACKEND:
+LOGIN:
+ATTENDANCE:
+ACADEMICS:
+VIDEO:
+MAIN ISSUES:
+NEXT THINGS TO FIX:
+
+IMPORTANT:
+Do not make large architectural changes.
+Do not migrate the database.
+Do not add unnecessary features.
+
+My goal is to understand and preview the EXISTING project first, identify exactly how it works, see where the data is stored, and find what is missing before making further changes.

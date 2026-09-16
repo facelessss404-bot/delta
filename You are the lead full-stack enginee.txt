@@ -1,0 +1,1083 @@
+You are the lead full-stack engineer responsible for completing and production-hardening this existing web application.
+
+PROJECT NAME:
+Delta Squad Foundation Management Platform
+
+PROJECT GOAL:
+Build a professional, production-grade, responsive role-based management platform inspired by the information architecture of a modern student/campus portal such as DigiCampus, but branded entirely for Delta Squad Foundation.
+
+IMPORTANT:
+Do NOT create a disconnected demo, mockup, or collection of static pages.
+Do NOT replace the existing application unnecessarily.
+First inspect the existing repository, understand the current implementation, identify what already works, and then extend/refactor it carefully.
+
+==================================================
+
+1. SOURCE OF TRUTH
+   ==================================================
+
+Treat the existing project files and the provided Developer Brief as the primary requirements.
+
+The existing application currently uses:
+
+Frontend:
+
+* React
+* Vite
+* React Router
+* Axios
+* Tailwind CSS
+* Framer Motion
+* Lucide React
+
+Backend:
+
+* Node.js
+* Express.js
+* MongoDB
+* Mongoose
+* JWT authentication
+* bcrypt/bcryptjs
+* dotenv
+* CORS
+
+Existing repository structure includes:
+
+backend/
+config/
+controllers/
+middleware/
+models/
+routes/
+seed.js
+server.js
+
+frontend/
+src/
+components/
+context/
+pages/
+services/
+App.jsx
+
+PRESERVE this architecture unless there is a strong technical reason to refactor it.
+
+Do not migrate the project to Firebase merely because Firebase is convenient.
+Do not introduce Neon/PostgreSQL if the existing application and project brief are built around MongoDB/Mongoose.
+Use ONE consistent database architecture throughout the application.
+
+The target architecture is:
+
+React frontend
+↓
+Axios / HTTP API
+↓
+Express + Node.js backend
+↓
+MongoDB + Mongoose
+
+For physical training videos:
+
+React frontend
+↓
+Backend requests secure presigned upload URL
+↓
+Private AWS S3 bucket
+↓
+MongoDB stores video metadata
+
+==================================================
+2. FIRST TASK — INSPECT THE EXISTING PROJECT
+============================================
+
+Before modifying code:
+
+1. Inspect the entire repository structure.
+2. Read package.json files for frontend and backend.
+3. Inspect all existing models.
+4. Inspect controllers.
+5. Inspect routes.
+6. Inspect authentication middleware.
+7. Inspect frontend routing.
+8. Inspect AuthContext.
+9. Inspect Axios/API service configuration.
+10. Inspect all dashboard components/pages.
+11. Inspect environment-variable usage.
+12. Identify every frontend API call.
+13. Identify every backend API route.
+14. Verify that frontend API URLs and backend routes actually match.
+15. Identify broken imports, missing routes, incorrect endpoint paths, CORS issues, authentication issues, schema mismatches, hard-coded data, and runtime errors.
+16. Reuse working code rather than unnecessarily rewriting it.
+
+After inspection, establish a clear internal map of:
+
+FRONTEND PAGE
+→ API SERVICE
+→ BACKEND ROUTE
+→ CONTROLLER
+→ MODEL
+→ DATABASE
+
+Every important feature must follow this complete chain.
+
+==================================================
+3. AUTHORITY HIERARCHY
+======================
+
+There are exactly three roles:
+
+1. TRAINING COMMANDER
+
+   * Highest authority
+   * Super user
+
+2. ADMIN
+
+   * Operational administrator
+   * Below Training Commander
+
+3. CADET
+
+   * End user
+   * Can view only their own official records
+   * Can submit their own physical evidence
+
+The role hierarchy must be enforced on the BACKEND.
+
+Frontend button hiding is NOT security.
+
+Every protected API endpoint must:
+
+* verify authentication
+* verify role
+* verify ownership where appropriate
+* reject unauthorized access
+
+A Cadet must never be able to access another Cadet's records by manually changing an ID in the URL or API request.
+
+==================================================
+4. AUTHENTICATION
+=================
+
+Implement or repair authentication so that the entire frontend/backend flow works correctly.
+
+Required functionality:
+
+POST /api/auth/login
+GET /api/auth/me
+POST /api/auth/logout
+
+Registration must be controlled and must not be openly available to cadets unless explicitly required.
+
+Use:
+
+* secure password hashing with bcrypt or Argon2
+* JWT or secure session authentication
+* preferably httpOnly, Secure and SameSite cookies for production where appropriate
+* authentication middleware
+* role authorization middleware
+
+Frontend must:
+
+* maintain authenticated user state
+* restore authentication when the application reloads
+* protect routes
+* redirect users according to their role
+* correctly handle expired/invalid authentication
+* avoid infinite redirects
+* avoid exposing secrets in frontend code
+
+==================================================
+5. FRONTEND ↔ BACKEND CONNECTION
+================================
+
+This is one of the highest priorities.
+
+Create ONE centralized Axios API client.
+
+Example architecture:
+
+frontend/src/services/api.js
+
+The API base URL must come from environment configuration.
+
+Example:
+
+VITE_API_BASE_URL=http://localhost:5000/api
+
+Do NOT hard-code different API URLs across multiple components.
+
+Every frontend feature must communicate through the centralized API service.
+
+Verify all routes against the real Express route registrations.
+
+The backend must explicitly mount routes.
+
+Example:
+
+app.use('/api/auth', authRoutes);
+app.use('/api/cadets', cadetRoutes);
+app.use('/api/subjects', subjectRoutes);
+app.use('/api/attendance', attendanceRoutes);
+app.use('/api/marks', marksRoutes);
+app.use('/api/physical', physicalRoutes);
+app.use('/api/reports', reportRoutes);
+
+Add:
+
+GET /api/health
+
+The health endpoint must return a useful success response and may include database connectivity status.
+
+Configure CORS explicitly for the actual frontend origin.
+
+Do not create frontend pages that use fake data when real API integration is expected.
+
+==================================================
+6. USER EXPERIENCE / DASHBOARDS
+===============================
+
+Create role-specific dashboards.
+
+TRAINING COMMANDER DASHBOARD:
+
+* Total cadets
+* Active admins
+* Overall attendance
+* Subject-wise attendance
+* Pending physical submissions
+* Recent academic updates
+* Alerts/exceptions
+* Operational reports
+* Quick actions
+* Admin management
+
+ADMIN DASHBOARD:
+
+* Cadet count
+* Cadet management
+* Attendance actions
+* Pending physical reviews
+* Marks/assessment activity
+* Operational summaries
+
+CADET DASHBOARD:
+
+* Overall attendance
+* Total sessions
+* Subject breakdown
+* Academic performance summary
+* Physical submission/completion status
+* Quick action to upload today's physical evidence
+
+Navigation must change according to role.
+
+==================================================
+7. CADET MANAGEMENT
+===================
+
+Implement proper Cadet management.
+
+Cadet fields should support:
+
+* userId
+* cadetId / rollNo
+* name
+* batch
+* programme
+* status
+* timestamps
+
+Training Commander and Admin can manage cadets according to their permissions.
+
+Cadets cannot modify official academic or attendance records.
+
+==================================================
+8. SUBJECT MANAGEMENT
+=====================
+
+The explicitly confirmed subjects are:
+
+* Physics
+* Mathematics
+* SSB
+* JEE
+
+Do NOT invent additional official subjects as a replacement for the confirmed list.
+
+The subject catalogue must remain configurable so future subjects can be added.
+
+Support fields such as:
+
+* name
+* code
+* category/type
+* active
+
+Support Cadet-to-Subject assignments.
+
+==================================================
+9. ATTENDANCE — CORE FUNCTIONALITY
+==================================
+
+Attendance must be SESSION-BASED and SUBJECT-SPECIFIC.
+
+Never calculate attendance from a hard-coded percentage.
+
+Required data concepts:
+
+AttendanceSession:
+
+* subjectId
+* batch/class
+* date
+* startTime
+* endTime
+* sessionType
+
+AttendanceRecord:
+
+* sessionId
+* cadetId
+* status
+* markedBy
+* markedAt
+* updatedBy
+* updatedAt
+
+Attendance statuses:
+
+* PRESENT
+* ABSENT
+
+Authorized users must be able to:
+
+1. select subject
+2. select date
+3. select session/time
+4. select relevant class/batch
+5. load all cadets assigned to that subject/class
+6. mark attendance
+7. Mark All Present
+8. Mark All Absent
+9. make individual corrections
+
+Attendance corrections must be auditable.
+
+Attendance percentage must be calculated dynamically from actual attendance records.
+
+Cadets are strictly read-only.
+
+Cadets must be able to see:
+
+* overall attendance percentage
+* total sessions
+* each assigned subject
+* subject category/type
+* total sessions
+* present count
+* absent count
+* percentage
+* detailed chronological session history
+
+Use:
+
+* PRESENT = clear green visual state
+* ABSENT = clear red visual state
+
+Attendance page must work well on mobile.
+
+==================================================
+10. ACADEMICS / MARKS
+=====================
+
+Implement a dedicated Academics section.
+
+Marks must be stored by:
+
+cadet + subject + assessment
+
+Assessment should support:
+
+* subjectId
+* title
+* assessmentType
+* date
+* maxMarks
+
+Marks should support:
+
+* assessmentId
+* cadetId
+* marks
+* enteredBy
+* enteredAt
+* updatedAt
+
+Authorized staff can create/update marks.
+
+Cadets can only view their own marks.
+
+Do NOT silently destroy important historical academic data.
+
+Support configurable assessment types without requiring a code rewrite.
+
+Display:
+
+* subject-wise performance
+* assessment history
+* marks
+* maximum marks
+* performance summaries
+
+==================================================
+11. PHYSICAL TRAINING / VIDEO UPLOAD
+====================================
+
+Physical Training must be a separate module.
+
+Cadets must be able to upload evidence for:
+
+* Morning Run
+* Physical Training
+* other configured physical activities
+
+The frontend must support device/mobile video selection.
+
+Upload flow:
+
+1. Cadet selects activity.
+2. Cadet selects/records date.
+3. Frontend asks backend for a presigned upload URL.
+4. Backend generates secure presigned S3 upload URL.
+5. Frontend uploads directly to private AWS S3.
+6. Frontend notifies backend that upload completed.
+7. Backend stores metadata in MongoDB.
+
+Do NOT store video binaries inside MongoDB.
+
+MongoDB stores metadata such as:
+
+* cadetId
+* activityType
+* date
+* s3ObjectKey
+* filename
+* MIME type
+* size
+* uploadStatus
+* reviewStatus
+* reviewedBy
+* reviewedAt
+* comment
+
+S3 bucket must remain private.
+
+Never expose permanent public video URLs.
+
+When an authorized user views a video, backend should generate a short-lived signed viewing URL.
+
+Required API concepts:
+
+POST /api/physical/presign
+POST /api/physical/complete
+GET /api/physical/my
+GET /api/physical/cadet/:cadetId
+PATCH /api/physical/:id/review
+
+Review statuses:
+
+* Pending
+* Accepted
+* Rejected
+
+Commander/Admin can:
+
+* view submissions
+* review submissions
+* change status
+* add comments
+
+Cadets can:
+
+* upload
+* view upload history
+* see status
+* see feedback
+
+Show upload progress.
+
+==================================================
+12. API CONTRACT
+================
+
+Implement and verify a clean API structure.
+
+Authentication:
+POST /api/auth/login
+POST /api/auth/register
+GET /api/auth/me
+POST /api/auth/logout
+
+Cadets:
+GET /api/cadets
+GET /api/cadets/:id
+POST /api/cadets
+PATCH /api/cadets/:id
+DELETE /api/cadets/:id
+
+Subjects:
+GET /api/subjects
+POST /api/subjects
+PATCH /api/subjects/:id
+DELETE /api/subjects/:id
+
+Attendance:
+POST /api/attendance/sessions
+POST /api/attendance/records/bulk
+PATCH /api/attendance/records/:id
+GET /api/attendance/my
+GET /api/attendance/cadet/:cadetId
+
+Academics:
+GET /api/academics/my
+GET /api/marks/cadet/:cadetId
+POST /api/marks
+PATCH /api/marks/:id
+
+Physical:
+POST /api/physical/presign
+POST /api/physical/complete
+GET /api/physical/my
+GET /api/physical/cadet/:cadetId
+PATCH /api/physical/:id/review
+
+Reports:
+GET /api/reports/...
+
+Health:
+GET /api/health
+
+You may reorganize endpoints if necessary, but maintain a coherent REST architecture and keep frontend/backend contracts synchronized.
+
+==================================================
+13. DATABASE DESIGN
+===================
+
+Use MongoDB + Mongoose consistently.
+
+Core models should include:
+
+User
+Cadet
+Subject
+CadetSubject
+AttendanceSession
+AttendanceRecord
+Assessment
+Mark
+PhysicalSubmission
+AuditLog
+
+Add timestamps where useful.
+
+Use references/ObjectIds appropriately.
+
+Add indexes where they materially improve query performance.
+
+Avoid duplicated derived data unless justified.
+
+Attendance percentages should be computed from source records.
+
+==================================================
+14. AUDIT LOGGING
+=================
+
+Implement an audit system for important administrative changes.
+
+AuditLog should include:
+
+* actorId
+* action
+* entityType
+* entityId
+* before
+* after
+* timestamp
+
+At minimum, important changes to:
+
+* attendance
+* marks
+* user/cadet management
+* physical review decisions
+
+should be traceable.
+
+==================================================
+15. ERROR HANDLING
+==================
+
+Use meaningful HTTP status codes:
+
+401 = unauthenticated
+403 = unauthorized
+404 = resource not found
+400/422 = validation error
+500 = unexpected server error
+
+Centralize API error handling on the frontend.
+
+Important pages must have:
+
+* loading state
+* empty state
+* error state
+* retry capability where appropriate
+
+Do not spam duplicate toast notifications.
+
+Fix React hook dependency warnings instead of suppressing them.
+
+Backend errors should be logged with useful debugging context without exposing secrets.
+
+==================================================
+16. UI / UX
+===========
+
+Use Delta Squad Foundation branding.
+
+Target design:
+
+* premium
+* professional
+* modern
+* dark navy/charcoal portal
+* glass/card surfaces
+* restrained gradients
+* rounded cards
+* subtle shadows
+* tasteful Framer Motion animations
+* animated progress indicators
+* clear status states
+* skeleton loaders
+* useful empty states
+* inline error states
+
+Do NOT over-animate the application.
+
+Responsive requirements:
+
+* desktop
+* tablet
+* mobile
+
+Mobile is especially important for:
+
+* attendance workflows
+* physical video uploads
+* dashboard viewing
+
+Accessibility:
+
+* keyboard navigation
+* readable contrast
+* labels
+* touch-friendly controls
+* reduced-motion support
+
+==================================================
+17. ROUTING
+===========
+
+Implement protected frontend routes.
+
+Example:
+
+/
+Login
+
+/admin
+AdminDashboard
+
+/commander
+CommanderDashboard
+
+/cadet
+CadetDashboard
+
+Additional role-specific routes should be added for:
+
+* Cadets
+* Attendance
+* Academics
+* Physical Training
+* Reports
+* Notifications
+* Settings
+
+Unauthenticated users must be redirected to login.
+
+Users must not be able to manually access another role's pages.
+
+Remember:
+frontend route protection is for UX;
+backend authorization is the real security boundary.
+
+==================================================
+18. SECURITY
+============
+
+Never commit secrets.
+
+Use environment variables for:
+
+* MongoDB connection string
+* JWT/session secrets
+* AWS credentials
+* S3 bucket information
+* frontend API URL
+* other sensitive configuration
+
+Never expose backend secrets through React environment variables.
+
+Validate:
+
+* authentication
+* roles
+* ownership
+* input data
+* uploads
+* file type
+* file size
+
+Consider malware scanning for uploaded files in a production deployment.
+
+Protect against:
+
+* IDOR / broken object-level authorization
+* unauthorized API access
+* invalid JWTs
+* malformed requests
+* public S3 object exposure
+
+==================================================
+19. DATA / API CONSISTENCY
+==========================
+
+This is critical.
+
+For EVERY feature verify:
+
+Frontend component
+→ frontend service function
+→ exact API URL
+→ HTTP method
+→ Express route
+→ authentication middleware
+→ authorization middleware
+→ controller
+→ Mongoose model
+→ MongoDB
+
+Do not allow mismatches such as:
+
+Frontend:
+GET /api/attendance/my
+
+Backend:
+GET /api/attendance
+
+unless the frontend is updated to match the actual intended contract.
+
+Search the entire repository for:
+
+* hard-coded API URLs
+* old endpoint names
+* fake/mock data
+* unused API functions
+* dead routes
+* broken imports
+* duplicate API clients
+* stale model fields
+
+Remove or repair inconsistencies.
+
+==================================================
+20. DO NOT BREAK EXISTING FUNCTIONALITY
+=======================================
+
+Before changing existing code:
+
+* understand why it exists
+* determine whether it is currently used
+* preserve compatible behavior
+* update dependent frontend/backend code together
+
+When modifying a model:
+
+* check every controller using it
+* check every route
+* check every frontend component using the returned data
+
+Avoid destructive migrations without a clear reason.
+
+==================================================
+21. TESTING
+===========
+
+Before declaring the project complete, test all critical paths.
+
+Authentication:
+
+* commander login
+* admin login
+* cadet login
+* invalid login
+* logout
+* expired/invalid auth
+
+Authorization:
+
+* commander permissions
+* admin permissions
+* cadet permissions
+* direct unauthorized API requests
+* ID manipulation attempts
+
+Attendance:
+
+* create session
+* load cadets
+* mark present
+* mark absent
+* bulk mark
+* individual correction
+* percentage calculation
+* cadet read-only access
+
+Academics:
+
+* create assessment
+* enter marks
+* update marks
+* historical records
+* cadet read-only access
+
+Physical:
+
+* presigned upload
+* S3 upload
+* completion callback
+* metadata persistence
+* submission history
+* review
+* rejection
+* acceptance
+* signed viewing URL
+
+Frontend:
+
+* protected routing
+* responsive layout
+* loading states
+* empty states
+* error states
+* API failures
+* mobile upload
+* no console-breaking React errors
+
+Backend:
+
+* all routes mounted
+* health endpoint works
+* DB connection works
+* CORS works
+* validation works
+* proper HTTP codes returned
+
+==================================================
+22. ENVIRONMENT CONFIGURATION
+=============================
+
+Use clear environment files.
+
+Backend example:
+
+PORT=5000
+MONGO_URI=...
+JWT_SECRET=...
+AWS_REGION=...
+AWS_ACCESS_KEY_ID=...
+AWS_SECRET_ACCESS_KEY=...
+AWS_S3_BUCKET=...
+
+Frontend example:
+
+VITE_API_BASE_URL=http://localhost:5000/api
+
+Do not commit real secrets.
+
+Provide/update .env.example files with placeholder values.
+
+==================================================
+23. SEED DATA
+=============
+
+Maintain a development seed script.
+
+Development seed data should include:
+
+* one Training Commander
+* one Admin
+* sample Cadets
+* confirmed subjects:
+
+  * Physics
+  * Mathematics
+  * SSB
+  * JEE
+* sample attendance sessions/records
+* sample assessments/marks where useful
+
+Clearly label seed credentials as development-only.
+
+Never use fake data in places that should represent live production data.
+
+==================================================
+24. IMPLEMENTATION ORDER
+========================
+
+Work in this order:
+
+PHASE 1
+Inspect repository and identify current architecture/problems.
+
+PHASE 2
+Stabilize MongoDB connection and Mongoose models.
+
+PHASE 3
+Stabilize authentication.
+
+PHASE 4
+Implement server-side RBAC and ownership checks.
+
+PHASE 5
+Stabilize API routes/controllers.
+
+PHASE 6
+Stabilize centralized frontend API service and environment configuration.
+
+PHASE 7
+Implement Cadet and Subject management.
+
+PHASE 8
+Implement session-based Attendance.
+
+PHASE 9
+Implement Academics/Marks.
+
+PHASE 10
+Implement Physical Training + S3 upload.
+
+PHASE 11
+Implement dashboards and reports.
+
+PHASE 12
+Implement audit logs, notifications and settings.
+
+PHASE 13
+Improve responsive/mobile UI.
+
+PHASE 14
+Run full integration and security testing.
+
+==================================================
+25. IMPORTANT DEVELOPMENT RULE
+==============================
+
+Do NOT stop after creating UI.
+
+Do NOT assume an API works merely because the endpoint exists.
+
+Actually connect every page to the real backend.
+
+Do NOT create fake success responses.
+
+Do NOT leave TODO placeholders in core functionality.
+
+Do NOT declare the application finished while frontend/backend API mismatches remain.
+
+Do NOT migrate to Firebase unless there is an explicit later architectural decision to do so.
+
+The current target architecture is:
+
+React
++
+Axios
++
+Express/Node
++
+MongoDB/Mongoose
++
+AWS S3
+
+==================================================
+26. FINAL ACCEPTANCE CRITERIA
+=============================
+
+The application is considered complete only when:
+
+1. Training Commander can log in and access the complete command console.
+2. Commander can manage Admin accounts.
+3. Admin can manage Cadets and operational records.
+4. Cadets can access only their own official records.
+5. Backend RBAC blocks unauthorized API calls.
+6. Attendance is stored by subject/session/date.
+7. Attendance percentages are dynamically calculated.
+8. Attendance corrections are auditable.
+9. Subjects are configurable and the confirmed subjects are preserved.
+10. Academic marks are assessment-based and historical.
+11. Cadets can upload physical-training videos.
+12. Videos are stored privately in S3.
+13. MongoDB stores physical-submission metadata.
+14. Authorized staff can review physical submissions.
+15. Frontend and backend use one consistent API contract.
+16. API base URL is centralized and environment-driven.
+17. Database connectivity works correctly.
+18. Authentication persists correctly.
+19. Errors and loading states are handled.
+20. Mobile and desktop layouts work correctly.
+21. No unresolved frontend/backend route mismatches remain.
+22. No unauthorized user can access another user's records by changing IDs.
+23. No secrets are exposed or committed.
+24. No critical console errors remain.
+25. No core functionality depends on hard-coded fake data.
+
+==================================================
+27. HOW TO WORK
+===============
+
+Start by inspecting the repository.
+
+Do not immediately rewrite the whole application.
+
+First produce a concise implementation diagnosis internally based on the existing codebase.
+
+Then make the necessary changes.
+
+After each major change, verify that dependent code still works.
+
+Prefer small coherent changes over uncontrolled rewrites.
+
+At the end:
+
+* summarize what was already working
+* summarize what you fixed
+* summarize what you added
+* list important files changed
+* list required environment variables
+* list commands to run backend and frontend
+* identify any remaining issue that genuinely requires external credentials or infrastructure
+
+The final objective is a fully connected, production-quality Delta Squad Foundation management platform where the React frontend, Express backend, MongoDB database, authentication, RBAC, attendance, academics and S3 physical-video workflow operate as one coherent system.

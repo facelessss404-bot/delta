@@ -1,0 +1,757 @@
+@import "tailwindcss";
+
+/* ================================================================
+   DELTA SQUAD FOUNDATION — PREMIUM DESIGN SYSTEM v2
+   Base: 4px grid · Type: Inter · Palette: Military dark + Gold
+   Theme: Deep forest dark, obsidian glass, liquid gold
+   ================================================================ */
+
+@theme {
+  /* — Accent — */
+  --color-gold: #C9A84C;
+  --color-gold-bright: #E8C86A;
+  --color-gold-muted: rgba(201, 168, 76, 0.15);
+  --color-gold-subtle: rgba(201, 168, 76, 0.08);
+  --color-gold-glow: rgba(201, 168, 76, 0.25);
+
+  /* — Neutrals (warm-tinted dark) — */
+  --color-darkGreen: #0B1A13;
+  --color-surface: #0F2119;
+  --color-surface-2: #122518;
+  --color-surface-hover: #142A1F;
+  --color-surface-active: #193323;
+
+  /* — Semantic — */
+  --color-success: #34D399;
+  --color-success-muted: rgba(52, 211, 153, 0.12);
+  --color-error: #F87171;
+  --color-error-muted: rgba(248, 113, 113, 0.10);
+  --color-warning: #FBBF24;
+  --color-info: #60A5FA;
+
+  /* — Border — */
+  --color-border: rgba(255, 255, 255, 0.07);
+  --color-border-strong: rgba(255, 255, 255, 0.14);
+  --color-border-gold: rgba(201, 168, 76, 0.2);
+}
+
+/* ================================================================
+   FONT IMPORT
+   ================================================================ */
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('https://fonts.gstatic.com/s/inter/v18/UcCo3FwrK3iLTcviYwY.woff2') format('woff2');
+}
+
+/* ================================================================
+   GLOBAL RESET & BASE
+   ================================================================ */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
+  text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #0B1A13;
+  color: #F0EFE8;
+  line-height: 1.6;
+  font-size: 16px;
+  min-width: 320px;
+  overflow-x: hidden;
+}
+
+#root { min-height: 100vh; }
+
+/* Ambient background orbs */
+body::before,
+body::after {
+  content: '';
+  position: fixed;
+  z-index: -1;
+  border-radius: 999px;
+  filter: blur(100px);
+  pointer-events: none;
+  opacity: .14;
+  transition: opacity 2s ease;
+}
+body::before {
+  top: -20rem; right: -15rem;
+  width: 40rem; height: 40rem;
+  background: radial-gradient(circle, #c9a84c 0%, transparent 70%);
+}
+body::after {
+  bottom: -22rem; left: -16rem;
+  width: 44rem; height: 44rem;
+  background: radial-gradient(circle, #157a51 0%, transparent 70%);
+}
+
+/* Selection */
+::selection {
+  background: rgba(201, 168, 76, 0.28);
+  color: #F0EFE8;
+}
+
+/* ================================================================
+   SCROLLBAR
+   ================================================================ */
+
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: rgba(201, 168, 76, 0.35);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover { background: rgba(201, 168, 76, 0.55); }
+
+/* ================================================================
+   FOCUS & ACCESSIBILITY
+   ================================================================ */
+
+:focus-visible {
+  outline: 2px solid rgba(201, 168, 76, 0.6);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+.skip-link {
+  position: fixed; left: 12px; top: -60px; z-index: 9999;
+  border-radius: 10px; background: #C9A84C; color: #0B1A13;
+  padding: 10px 16px; font-weight: 700; font-size: 14px;
+  transition: top .18s ease;
+  box-shadow: 0 4px 20px rgba(201,168,76,.4);
+}
+.skip-link:focus { top: 12px; }
+
+/* ================================================================
+   REDUCED MOTION
+   ================================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ================================================================
+   SHADOW SYSTEM
+   ================================================================ */
+
+.shadow-premium {
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.06) inset,
+    0 4px 20px rgba(0,0,0,0.35),
+    0 1px 3px rgba(0,0,0,0.6);
+}
+
+.shadow-glow {
+  box-shadow:
+    0 0 0 1px rgba(201,168,76,0.2),
+    0 8px 32px rgba(201,168,76,0.15),
+    0 2px 8px rgba(201,168,76,0.08),
+    0 1px 0 rgba(201,168,76,0.2) inset;
+}
+
+.shadow-card {
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.05) inset,
+    0 2px 12px rgba(0,0,0,0.4),
+    0 1px 2px rgba(0,0,0,0.7);
+}
+
+.image-frame {
+  box-shadow:
+    0 12px 48px rgba(0,0,0,0.55),
+    0 1px 0 rgba(255,255,255,0.08) inset,
+    0 0 0 1px rgba(255,255,255,0.04);
+}
+
+/* ================================================================
+   GLASS PANEL — core surface component
+   ================================================================ */
+
+.glass-panel {
+  background: linear-gradient(
+    155deg,
+    rgba(24, 52, 38, 0.88) 0%,
+    rgba(12, 30, 22, 0.92) 60%,
+    rgba(9, 24, 17, 0.95) 100%
+  );
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.06) inset,
+    0 4px 24px rgba(0,0,0,0.3),
+    0 1px 3px rgba(0,0,0,0.5);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  transition: border-color .3s ease, box-shadow .3s ease, transform .25s ease;
+}
+
+.glass-panel:hover {
+  border-color: rgba(201, 168, 76, 0.15);
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.08) inset,
+    0 8px 40px rgba(0,0,0,0.35),
+    0 1px 3px rgba(0,0,0,0.6);
+}
+
+/* ================================================================
+   FORM ELEMENTS
+   ================================================================ */
+
+.field {
+  box-sizing: border-box;
+  width: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.28);
+  color: #F0EFE8;
+  padding: 11px 14px;
+  font-size: 14px;
+  font-family: inherit;
+  transition: border-color .2s ease, box-shadow .2s ease, background .2s ease;
+  outline: none;
+}
+
+.field::placeholder { color: rgba(240, 239, 232, 0.3); }
+.field:hover { border-color: rgba(255, 255, 255, 0.16); background: rgba(0,0,0,0.32); }
+.field:focus {
+  border-color: rgba(201, 168, 76, 0.6) !important;
+  box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.1), 0 1px 3px rgba(0,0,0,0.3);
+  background: rgba(0,0,0,0.35);
+}
+
+select.field option {
+  background: #0F2119;
+  color: #F0EFE8;
+}
+
+/* ================================================================
+   INTERACTIVE ELEMENTS
+   ================================================================ */
+
+button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
+
+button {
+  transition: transform .15s ease, box-shadow .15s ease, filter .15s ease, background-color .2s ease, opacity .15s ease;
+  cursor: pointer;
+}
+button:not(:disabled):active { transform: translateY(1px) scale(0.982) !important; }
+button:disabled { cursor: not-allowed; }
+
+input, select, textarea {
+  transition: border-color .2s ease, box-shadow .2s ease, background-color .2s ease;
+}
+input:hover:not(:focus):not(:disabled),
+select:hover:not(:focus):not(:disabled),
+textarea:hover:not(:focus):not(:disabled) {
+  border-color: rgba(255,255,255,0.16);
+}
+input:focus, select:focus, textarea:focus {
+  border-color: rgba(201,168,76,0.65) !important;
+  box-shadow: 0 0 0 3px rgba(201,168,76,0.1) !important;
+}
+
+/* ================================================================
+   METRIC / STAT CARDS  — premium upgrade
+   ================================================================ */
+
+/* Applied to any div that Tailwind renders as a metric card */
+.rounded-2xl.border.border-white\/10.bg-black\/20.p-4,
+.rounded-2xl.border.border-white\/10.bg-black\/20.p-3 {
+  background: linear-gradient(155deg, rgba(20,46,34,.9), rgba(10,26,18,.95)) !important;
+  border: 1px solid rgba(255,255,255,.08) !important;
+  border-top: 1px solid rgba(255,255,255,.12) !important;
+  box-shadow:
+    0 1px 0 rgba(255,255,255,.06) inset,
+    0 4px 20px rgba(0,0,0,.35),
+    0 1px 2px rgba(0,0,0,.6);
+  transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+}
+.rounded-2xl.border.border-white\/10.bg-black\/20.p-4:hover,
+.rounded-2xl.border.border-white\/10.bg-black\/20.p-3:hover {
+  transform: translateY(-2px);
+  border-color: rgba(201,168,76,.18) !important;
+  box-shadow:
+    0 1px 0 rgba(255,255,255,.08) inset,
+    0 8px 32px rgba(0,0,0,.4),
+    0 2px 4px rgba(0,0,0,.7);
+}
+
+/* ================================================================
+   PROGRESS BARS — premium gold gradient
+   ================================================================ */
+
+.h-2.rounded-full.bg-gold,
+[class*="bg-gold"][class*="rounded-full"][class*="h-"] {
+  background: linear-gradient(90deg, #9D7A2A, #C9A84C, #E8C86A) !important;
+  box-shadow: 0 0 8px rgba(201,168,76,0.35);
+}
+
+.h-2.rounded-full.bg-white\/10,
+[class*="bg-white/10"][class*="rounded-full"][class*="h-"] {
+  background: rgba(255,255,255,0.07) !important;
+  overflow: hidden;
+}
+
+/* ================================================================
+   TYPOGRAPHY UPGRADES
+   ================================================================ */
+
+/* Page headings */
+.text-3xl.font-bold.text-white,
+h1.text-3xl { letter-spacing: -0.025em; }
+
+.text-gold { color: #C9A84C !important; }
+.text-2xl.font-bold.text-white { letter-spacing: -0.02em; }
+
+/* Uppercase labels / eyebrows */
+.text-sm.font-semibold.uppercase.tracking-wider.text-gold {
+  letter-spacing: 0.12em !important;
+  font-size: 11px !important;
+  background: linear-gradient(90deg, #C9A84C, #E8C86A);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ================================================================
+   TABLE-LIKE LIST ITEMS in pages
+   ================================================================ */
+
+.rounded-xl.border.border-white\/5.bg-black\/20.p-3 {
+  background: linear-gradient(145deg, rgba(18,42,30,.85), rgba(10,26,18,.9)) !important;
+  border: 1px solid rgba(255,255,255,.06) !important;
+  border-top-color: rgba(255,255,255,.1) !important;
+  transition: border-color .2s ease, background .2s ease;
+}
+.rounded-xl.border.border-white\/5.bg-black\/20.p-3:hover {
+  border-color: rgba(201,168,76,.15) !important;
+}
+
+/* ================================================================
+   GOLD BUTTONS (bg-gold class)
+   ================================================================ */
+
+.bg-gold {
+  background: linear-gradient(135deg, #B8922A 0%, #C9A84C 50%, #D4B45A 100%) !important;
+  box-shadow: 0 4px 14px rgba(201,168,76,0.3), 0 1px 0 rgba(255,255,255,0.3) inset !important;
+  color: #0B1A13 !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.01em;
+}
+.bg-gold:hover:not(:disabled) {
+  filter: brightness(1.1);
+  box-shadow: 0 6px 20px rgba(201,168,76,0.4), 0 1px 0 rgba(255,255,255,0.3) inset !important;
+  transform: translateY(-1px);
+}
+
+/* Ghost gold buttons */
+.border-gold\/30,
+[class*="border-gold"] { border-color: rgba(201,168,76,0.25) !important; }
+.text-gold { color: #C9A84C !important; }
+[class*="hover:bg-gold/10"]:hover { background: rgba(201,168,76,0.1) !important; }
+
+/* ================================================================
+   ALERT BADGES (success / error / warning)
+   ================================================================ */
+
+/* Success */
+.border.border-emerald-400\/20.bg-emerald-400\/10,
+[class*="border-emerald"][class*="bg-emerald"] {
+  background: linear-gradient(135deg, rgba(52,211,153,0.08), rgba(52,211,153,0.04)) !important;
+  border-color: rgba(52,211,153,0.2) !important;
+  box-shadow: 0 1px 0 rgba(52,211,153,.1) inset;
+}
+
+/* Error */
+.border.border-red-400\/20.bg-red-400\/10,
+[class*="border-red"][class*="bg-red"] {
+  background: linear-gradient(135deg, rgba(248,113,113,0.08), rgba(248,113,113,0.04)) !important;
+  border-color: rgba(248,113,113,0.2) !important;
+  box-shadow: 0 1px 0 rgba(248,113,113,.1) inset;
+}
+
+/* Gold alert */
+.border-gold\/15.bg-gold\/5,
+[class*="border-gold"][class*="bg-gold"] {
+  background: linear-gradient(135deg, rgba(201,168,76,0.07), rgba(201,168,76,0.03)) !important;
+  border-color: rgba(201,168,76,0.2) !important;
+}
+
+/* ================================================================
+   PULSE SKELETON LOADER — shimmer upgrade
+   ================================================================ */
+
+.animate-pulse {
+  animation: shimmer 2s ease-in-out infinite !important;
+  background: linear-gradient(
+    90deg,
+    rgba(255,255,255,0.02) 25%,
+    rgba(255,255,255,0.05) 50%,
+    rgba(255,255,255,0.02) 75%
+  ) !important;
+  background-size: 400% 100% !important;
+}
+@keyframes shimmer {
+  0% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* ================================================================
+   APP SHELL — sidebar / main layout
+   ================================================================ */
+
+.app-shell { position: relative; isolation: isolate; }
+
+/* Sidebar header layout */
+.sidebar-header {
+  height: 66px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  margin-bottom: 12px;
+  padding: 0 18px;
+}
+.sidebar-header-actions { display: flex; align-items: center; gap: 6px; }
+.sidebar-close-btn {
+  display: none;
+  background: none; border: none;
+  color: rgba(255,255,255,.5); cursor: pointer;
+  padding: 7px; border-radius: 8px;
+  transition: color .15s ease, background .15s ease;
+}
+.sidebar-close-btn:hover { color: #F0EFE8; background: rgba(255,255,255,.08); }
+
+/* Mobile topbar */
+.mobile-topbar {
+  display: none;
+  position: sticky; top: 0; z-index: 20;
+  height: 56px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 18px;
+  background: linear-gradient(180deg, rgba(14,34,24,.98), rgba(8,22,16,.99));
+  border-bottom: 1px solid rgba(255,255,255,.05);
+  box-shadow: 0 4px 20px rgba(0,0,0,.25);
+}
+.hamburger-btn {
+  background: none; border: none; color: #C9A84C;
+  cursor: pointer; padding: 7px; border-radius: 10px;
+  transition: background .15s ease;
+}
+.hamburger-btn:hover { background: rgba(201,168,76,.12); }
+
+/* Desktop sidebar */
+.desktop-sidebar {
+  width: 256px;
+  background: linear-gradient(180deg,
+    rgba(14, 35, 26, 0.99) 0%,
+    rgba(9, 22, 16, 0.99) 100%
+  ) !important;
+  border-right: 1px solid rgba(255,255,255,0.05);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+  box-shadow: 20px 0 60px rgba(0,0,0,.2), 1px 0 0 rgba(255,255,255,.04);
+  z-index: 3;
+}
+
+/* Mobile sidebar */
+.mobile-sidebar { display: none; }
+
+/* Backdrop */
+.sidebar-backdrop { display: none; }
+
+/* Portal styles */
+.app-sidebar h1 { text-transform: uppercase; }
+
+.app-nav a {
+  position: relative;
+  overflow: hidden;
+  border-radius: 10px;
+  transition: color .2s ease, background .2s ease, border-color .2s ease !important;
+}
+
+/* Subtle shimmer on active nav */
+.app-nav a[aria-current='page']::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(201,168,76,0.04), transparent);
+  pointer-events: none;
+}
+
+/* Nav link left accent bar */
+.app-nav a[aria-current='page']::after {
+  content: '';
+  position: absolute;
+  left: 0; top: 20%; bottom: 20%;
+  width: 3px;
+  background: linear-gradient(180deg, #C9A84C, #E8C86A);
+  border-radius: 0 3px 3px 0;
+  box-shadow: 0 0 8px rgba(201,168,76,0.5);
+}
+
+/* App main area */
+.app-main {
+  flex: 1;
+  overflow-y: auto;
+  padding: 32px;
+  position: relative;
+  background:
+    radial-gradient(ellipse at 85% 5%, rgba(201,168,76,.07) 0%, transparent 40%),
+    radial-gradient(ellipse at 10% 90%, rgba(21,122,81,.07) 0%, transparent 40%),
+    radial-gradient(ellipse at 50% 50%, rgba(12,30,22,.2) 0%, transparent 100%),
+    #0B1A13;
+}
+
+/* Page-enter animation */
+.app-main > div > * {
+  animation: page-enter .42s cubic-bezier(.2,.8,.2,1) both;
+}
+@keyframes page-enter {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ================================================================
+   HERO / PUBLIC PAGES
+   ================================================================ */
+
+.hero-primary { margin-right: .75rem; }
+.hero-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 50px;
+  padding: 0 1.5rem;
+  border: 1px solid rgba(245,245,240,.22);
+  border-radius: 14px;
+  color: #f0efe8;
+  font-size: .9rem;
+  font-weight: 600;
+  text-decoration: none;
+  background: rgba(11,26,19,.3);
+  backdrop-filter: blur(10px);
+  transition: background .2s ease, border-color .2s ease, transform .2s ease;
+}
+.hero-secondary:hover {
+  background: rgba(245,245,240,.1);
+  border-color: rgba(201,168,76,.6);
+  transform: translateY(-2px);
+}
+
+.public-page { background: linear-gradient(180deg, #0b1a13 0%, #0d2419 45%, #0b1a13 100%) !important; }
+.public-hero::after {
+  content: '';
+  position: absolute;
+  inset: auto 0 0;
+  height: 35%;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(transparent, rgba(11,26,19,.92));
+}
+.login-panel {
+  box-shadow:
+    0 32px 90px rgba(0,0,0,.4),
+    0 0 0 1px rgba(201,168,76,.08),
+    0 1px 0 rgba(255,255,255,.08) inset !important;
+  background: linear-gradient(155deg, rgba(20,48,35,.97), rgba(8,24,17,.98)) !important;
+}
+
+/* ================================================================
+   TAILWIND OVERRIDES — make utilities honor the design system
+   ================================================================ */
+
+/* rounded-3xl glass panels get extra polish */
+.glass-panel.rounded-3xl {
+  border-radius: 20px !important;
+}
+
+/* Max width containers inside app-main get breathing room */
+.mx-auto.max-w-7xl,
+.mx-auto.max-w-6xl { padding: 0 4px; }
+
+/* Space-y utility sections */
+.space-y-6 > * + *,
+.space-y-7 > * + * { margin-top: 1.5rem; }
+
+/* ================================================================
+   RESPONSIVE — Mobile: Hamburger / Overlay sidebar
+   ================================================================ */
+
+@media (max-width: 767px) {
+  .desktop-sidebar { display: none !important; }
+  .mobile-topbar { display: flex !important; }
+  .sidebar-close-btn { display: block !important; }
+
+  .app-shell {
+    flex-direction: column !important;
+    overflow: visible !important;
+    min-height: 100dvh;
+    height: auto !important;
+  }
+  .app-main {
+    flex: 1;
+    overflow-y: auto !important;
+    padding: 16px !important;
+    min-height: calc(100dvh - 56px);
+  }
+  .app-main > div { height: auto !important; }
+
+  .mobile-sidebar {
+    display: flex !important;
+    flex-direction: column;
+    justify-content: space-between;
+    position: fixed;
+    top: 0; left: 0; bottom: 0;
+    width: 280px;
+    max-width: 85vw;
+    z-index: 50;
+    background: linear-gradient(180deg, rgba(14,35,26,.99), rgba(8,22,16,.99)) !important;
+    border-right: 1px solid rgba(201,168,76,.15);
+    box-shadow: 20px 0 60px rgba(0,0,0,.55);
+    overflow-y: auto;
+  }
+
+  .sidebar-backdrop {
+    display: block !important;
+    position: fixed;
+    inset: 0;
+    z-index: 40;
+    background: rgba(0,0,0,.7);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+  }
+
+  .glass-panel { border-radius: 18px !important; }
+  .glass-panel.rounded-3xl { border-radius: 18px !important; }
+  .app-main .grid { gap: 12px; }
+
+  /* Stack heading actions on mobile */
+  .flex.flex-wrap.items-start.justify-between { flex-direction: column; }
+
+  /* Public hero */
+  .public-hero { height: min(100svh, 780px) !important; }
+  .public-hero h1 { font-size: clamp(2.8rem, 14vw, 4.2rem) !important; }
+  .public-hero p { font-size: 1rem !important; line-height: 1.55 !important; }
+  .login-panel { padding: 28px 20px !important; border-radius: 20px !important; }
+}
+
+@media (max-width: 480px) {
+  body { font-size: 15px; }
+  .mobile-sidebar { width: 265px; }
+  .app-main { padding: 12px !important; }
+  .app-main h1.text-3xl { font-size: 1.6rem !important; }
+  .app-main .p-6 { padding: 1rem !important; }
+  .app-main .p-7 { padding: 1.1rem !important; }
+  .app-main .text-3xl { font-size: 1.7rem !important; }
+  .hero-primary { display: block !important; width: 100%; margin: 0 0 .75rem !important; box-sizing: border-box; }
+  .hero-secondary { width: 100%; box-sizing: border-box; }
+}
+
+/* ================================================================
+   SPECIFIC PAGE POLISHES
+   ================================================================ */
+
+/* Section header chips */
+.text-sm.font-semibold.uppercase.tracking-wider {
+  font-size: 10.5px;
+  letter-spacing: 0.13em;
+}
+
+/* Attendance progress tracks */
+[class*="h-2"][class*="rounded-full"] {
+  border-radius: 99px !important;
+}
+
+/* Checkbox styling */
+input[type="checkbox"] {
+  accent-color: #C9A84C;
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+/* Fieldset legend */
+fieldset {
+  border: 1px solid rgba(255,255,255,0.09) !important;
+  border-radius: 12px !important;
+}
+fieldset legend { color: rgba(240,239,232,0.5); font-size: 12px; }
+
+/* Cadet profile/roster cards */
+.rounded-2xl.border.border-white\/10.bg-black\/20 {
+  background: linear-gradient(155deg, rgba(18,42,30,.85), rgba(10,26,18,.9)) !important;
+  border: 1px solid rgba(255,255,255,.07) !important;
+}
+
+/* Link colors in pages */
+a.text-gold { transition: color .15s ease; }
+a.text-gold:hover { color: #E8C86A !important; }
+
+/* Truncate email utility */
+.truncate { max-width: 100%; }
+
+/* Scrollable list max-heights */
+.max-h-\[34rem\] { max-height: 34rem; }
+
+/* Glass panels used as readonly info displays */
+.glass-panel.p-8.text-center { color: rgba(240,239,232,.45); }
+
+/* ================================================================
+   EXTRA MICRO-ANIMATIONS
+   ================================================================ */
+
+/* Hover lift on glass panels used as cards */
+.glass-panel.rounded-3xl:hover {
+  transform: translateY(-1px);
+}
+
+/* Gold icon containers */
+[class*="text-gold"] svg {
+  filter: drop-shadow(0 0 4px rgba(201,168,76,0.3));
+}
+
+/* Loading dots animation for pending states */
+@keyframes dot-bounce {
+  0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+  40% { transform: scale(1); opacity: 1; }
+}
+
+/* Smooth stat number entrance */
+@keyframes count-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Button ripple-scale on press (handled by active pseudo) */
+button:not(:disabled):focus-visible {
+  outline: 2px solid rgba(201,168,76,.55);
+  outline-offset: 2px;
+}
+
+/* ================================================================
+   PRINT (minimal)
+   ================================================================ */
+@media print {
+  .app-sidebar, .desktop-sidebar, .mobile-topbar { display: none !important; }
+  .app-main { padding: 0 !important; }
+  body { background: white !important; color: black !important; }
+}

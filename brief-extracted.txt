@@ -1,0 +1,271 @@
+﻿DELTA SQUAD FOUNDATION
+App Developer Brief — Product Structure, Roles & Functional Requirements
+DigiCampus-inspired architecture • Production-grade RBAC • Attendance • Academics • Physical Training
+1. Product Vision
+Build a centralized digital management platform for Delta Squad Foundation. The product should combine the strongest information-architecture ideas of a modern campus-management platform such as DigiCampus with the specific workflow of a military/cadet training organization.
+The application must feel professional, secure, fast, modern and scalable—not like a basic CRUD college project. Use DigiCampus only as product/UX inspiration; do not copy its branding, code or proprietary visual identity.
+2. Exact User Hierarchy
+The authority hierarchy is:
+TRAINING COMMANDER — SUPER USER / HIGHEST AUTHORITY
+ADMIN — OPERATIONAL ADMINISTRATOR, BELOW TRAINING COMMANDER
+CADET — END USER, SELF-SERVICE / READ-ONLY FOR OFFICIAL RECORDS
+This hierarchy must be enforced on the backend/API, not merely by hiding buttons in the frontend.
+Capability
+Training Commander
+Admin
+Cadet
+Manage Admin accounts
+Yes
+No
+No
+Manage Cadets
+Yes
+Yes
+No
+Manage Subjects
+Yes
+Yes*
+No
+Create/modify attendance sessions
+Yes
+Yes
+No
+Mark/edit attendance
+Yes
+Yes
+No
+View own attendance
+Yes
+Yes
+Yes
+View all cadet attendance
+Yes
+Yes
+No
+Enter/edit marks
+Yes
+Yes
+No
+View marks history
+Yes
+Yes
+Own only
+Review physical submissions
+Yes
+Yes
+No
+Upload own physical evidence
+No/optional
+No/optional
+Yes
+Reports/analytics
+Full
+Operational
+Own records
+*Final subject-management permission can be configured, but Training Commander always remains the highest authority.
+3. Exact Cadet Subjects
+The developer must NOT invent or substitute college subjects. The explicitly confirmed cadet subjects are:
+Physics
+Mathematics
+SSB
+JEE
+The subject catalogue must be configurable so additional subjects can be added later. If the client supplies the remaining original subject list, use that exact list rather than guessing.
+4. Main Application Modules
+Authentication & Role-Based Access Control
+Training Commander Dashboard
+Admin Dashboard
+Cadet Dashboard
+Cadet Management
+Subject/Class Management
+Attendance Management
+Academics / Marks & Performance History
+Physical Training & Daily Video Uploads
+Physical Submission Review
+Reports & Analytics
+Notifications
+Audit Logs
+System/Account Settings
+5. Attendance Management — Core Requirement
+Attendance must be session-based and subject-specific. It must never be a single hard-coded percentage.
+Admin/Training Commander selects subject, date, session/time and relevant class/batch.
+System loads every cadet assigned to that class/subject.
+Authorized staff can mark each cadet PRESENT or ABSENT.
+Provide efficient bulk actions such as Mark All Present, Mark All Absent, then allow individual corrections.
+Attendance records must store cadet, subject/session, date/time, status, markedBy, markedAt and update history.
+Authorized staff can correct attendance later, with an audit trail.
+Cadets cannot edit attendance.
+Attendance percentage must be calculated dynamically from attendance records.
+6. Cadet Attendance Experience
+The cadet attendance page should be mobile-first and inspired by the supplied DigiCampus-style reference.
+Overall attendance percentage and total sessions.
+Every assigned subject displayed as a separate card.
+Subject card: subject name, subject type/category, total sessions, circular percentage, present count, absent count, View Details.
+Subject details: chronological session/date/time history.
+Use a clear PRESENT (P) green status and ABSENT (A) red status.
+Term/batch/session filters where applicable.
+No edit controls for cadets.
+7. Academics / Marks & Performance
+Cadets need a dedicated Academics section where they can view their marks history. Official marks are managed by Training Commander/Admin.
+Marks must be stored by cadet + subject + assessment.
+Support configurable assessment names/types and maximum marks.
+Keep historical records rather than silently overwriting important academic history.
+Show subject-wise performance and assessment history.
+Support future assessment types without requiring a code rewrite.
+Authorized staff can add/update marks; cadets are read-only.
+8. Physical Training / Morning Physicals
+Physical training must be a separate module. Each cadet should be able to submit evidence of the morning run and other required physical activities from their device.
+Cadet selects the required activity (for example Morning Run / Physical Training).
+Cadet records/selects the date and uploads a video from the device.
+Show upload progress and upload completion status.
+Maintain a history of previous submissions.
+Submission states can include Pending, Accepted and Rejected.
+Training Commander/Admin can review the submission and add a comment.
+Cadets can see the status and review feedback for their own submissions.
+9. Video Storage Architecture
+Do not store large video binaries directly inside MongoDB. Use object storage for the actual video and MongoDB for metadata.
+Cadet device → frontend upload flow.
+Frontend obtains a secure presigned upload URL from the backend.
+Video is uploaded to a private AWS S3 bucket.
+MongoDB stores metadata such as cadetId, activityType, date, S3 object key, filename, MIME type, size, upload status, review status and review information.
+When an authorized user views a video, backend generates a short-lived signed viewing URL.
+The S3 bucket should remain private. Do not expose permanent public video URLs.
+10. DigiCampus-Inspired Information Architecture
+Use a centralized platform structure similar in spirit to modern campus-management systems: role-specific dashboards, centralized student/cadet records, attendance, academics, examinations/assessments, analytics and reports.
+Recommended navigation:
+Dashboard
+Cadets
+Attendance
+Academics
+Physical Training
+Reports
+Notifications
+Settings
+The navigation must change according to role. A Cadet should see only the modules relevant to their own records and submissions.
+11. Dashboard Requirements
+Training Commander dashboard:
+Total cadets
+Active admins
+Overall attendance overview
+Subject-wise attendance
+Pending physical submissions
+Recent academic updates
+Alerts/exceptions
+Operational reports and quick actions
+Admin dashboard:
+Cadet count
+Attendance actions
+Pending physical reviews
+Recent marks/assessment activity
+Operational attendance and submission summaries
+Cadet dashboard:
+Overall attendance
+Total sessions
+Subject breakdown
+Academic performance summary
+Physical submission/completion status
+Quick action to upload today's physical evidence
+12. UI / UX Direction
+Use Delta Squad Foundation branding throughout the application.
+Professional, premium dashboard aesthetic.
+Dark navy/charcoal cadet portal is acceptable and should remain highly readable.
+Use restrained gradients, glass/card surfaces, rounded cards and subtle shadows.
+Animated progress rings and micro-interactions should communicate state without becoming distracting.
+Use skeleton loaders for data-heavy screens.
+Use clear empty states and inline error states.
+Responsive design: desktop, tablet and mobile.
+Mobile attendance and physical-upload flows are especially important.
+Meet accessibility basics: keyboard navigation, contrast, labels, touch-friendly controls and reduced-motion support.
+13. Suggested MongoDB Data Model
+Model
+Core fields
+User
+name, email, passwordHash, role, status, timestamps
+Cadet
+userId, cadetId/rollNo, name, batch, programme, status, timestamps
+Subject
+name, code, category/type, active
+CadetSubject
+cadetId, subjectId, batch/term, assignedAt
+AttendanceSession
+subjectId, batch/class, date, startTime, endTime, sessionType
+AttendanceRecord
+sessionId, cadetId, status, markedBy, markedAt, updatedBy, updatedAt
+Assessment
+subjectId, title, assessmentType, date, maxMarks
+Mark
+assessmentId, cadetId, marks, enteredBy, enteredAt, updatedAt
+PhysicalSubmission
+cadetId, activityType, date, s3ObjectKey, filename, size, mimeType, uploadStatus, reviewStatus, reviewedBy, reviewedAt, comment
+AuditLog
+actorId, action, entityType, entityId, before/after, timestamp
+14. Suggested API Structure
+POST /api/auth/login
+POST /api/auth/register (controlled; not open to cadets unless explicitly required)
+GET /api/auth/me
+POST /api/auth/logout
+GET /api/cadets
+GET /api/cadets/:id
+GET /api/subjects
+POST /api/subjects
+POST /api/attendance/sessions
+POST /api/attendance/records/bulk
+PATCH /api/attendance/records/:id
+GET /api/attendance/my
+GET /api/attendance/cadet/:cadetId
+GET /api/academics/my
+GET /api/marks/cadet/:cadetId
+POST /api/marks
+PATCH /api/marks/:id
+POST /api/physical/presign
+POST /api/physical/complete
+GET /api/physical/my
+GET /api/physical/cadet/:cadetId
+PATCH /api/physical/:id/review
+GET /api/reports/...
+15. Authentication & Security — Non-Negotiable
+Use secure password hashing such as bcrypt or Argon2.
+Use secure session cookies or a properly designed short-lived access-token + refresh-token strategy.
+Prefer httpOnly, Secure, SameSite cookies for production authentication where appropriate.
+Implement server-side RBAC middleware.
+Every protected endpoint must verify authentication and authorization.
+A Cadet must never be able to request another cadet's private records by changing an ID in the URL.
+Validate ownership on attendance/marks/physical endpoints.
+Validate uploads by file type, size and expected content; consider malware scanning for production.
+Keep S3 private and use signed URLs.
+Add an API health endpoint such as GET /api/health.
+Use environment variables for database credentials, JWT/session secrets, S3 credentials and frontend API URL.
+Configure CORS explicitly for the real frontend origin.
+Never commit secrets to source control.
+16. Reliability / Error Handling
+Backend routes must be explicitly mounted and verified.
+Frontend and backend must use one consistent API base URL configuration.
+Return meaningful HTTP status codes: 401 for unauthenticated, 403 for unauthorized, 404 for missing resources, 422/400 for validation errors and 500 for unexpected server errors.
+Do not spam users with repeated identical toast notifications.
+Use inline error states for data-fetch failures.
+Fix React hook dependency warnings rather than suppressing them.
+Centralize API error handling.
+Add loading, retry and empty states to important data screens.
+Log server errors with enough context for debugging without exposing secrets.
+17. Testing & Acceptance Criteria
+Commander can log in and access the complete command/admin console.
+Commander can create/manage Admin accounts.
+Admin can manage cadets and operational records but cannot exceed Commander permissions.
+Cadet can log in and see only their own information.
+Attendance can be created per subject/session/date and marked for every cadet.
+Attendance can be corrected by authorized staff and changes are auditable.
+Cadet attendance percentages and subject histories are dynamically correct.
+Cadet can see every subject assigned to them.
+Marks history is subject-wise and assessment-wise.
+Cadet can upload a physical-training video successfully.
+Video is stored in private S3 and metadata is stored in MongoDB.
+Admin/Commander can review the video and change its review status.
+Unauthorized API requests are rejected even if a user manually calls the endpoint.
+Responsive UI works on mobile and desktop.
+No console-breaking React errors, missing routes or obvious API mismatches remain before handoff.
+18. Developer Implementation Rule
+Build this as a real product, not as a collection of disconnected pages. Start with the data model, authentication, RBAC and API contracts; then implement the role-specific UI on top of those stable contracts. Use reusable components, centralized API services, validation and clear separation between presentation, business logic and data access.
+19. Final Developer Brief — Copy/Paste Version
+Build the Delta Squad Foundation management platform as a production-grade, role-based cadet management system.AUTHORITY:1. Training Commander = SUPER USER / highest authority.2. Admin = below Training Commander.3. Cadet = end user with access only to their own records and submissions.The backend must enforce this hierarchy with real authorization middleware. Frontend button hiding is not security.CONFIRMED CADET SUBJECTS:- Physics- Mathematics- SSB- JEEDo not replace these with college subjects or invent a different subject list. Make the subject catalogue configurable for future additions.CORE MODULES:- Authentication- Training Commander dashboard- Admin dashboard- Cadet dashboard- Cadet management- Subject management- Subject/session-based attendance- Academics / marks history- Physical training and morning video uploads- Physical submission review- Reports and analytics- Notifications- Audit logs- SettingsATTENDANCE:Admin/Commander selects subject + date + session and sees every cadet. They can Mark All Present/Absent and individually correct records. Store attendance per cadet, subject, session and date/time. Calculate percentages dynamically. Cadets are strictly read-only and can see every assigned subject, total sessions, present/absent counts, percentage and detailed date/session history.ACADEMICS:Cadets see their own subject-wise marks history. Admin/Commander can enter/update marks. Support configurable assessment types and max marks. Preserve historical/audit information.PHYSICALS:Cadets have a separate Physical Training section for uploading videos of their morning run and required physical activities. Upload from mobile/device. Use AWS S3 for actual video storage and MongoDB for metadata. Keep S3 private and use presigned URLs. Admin/Commander can review submissions as Pending/Accepted/Rejected and add comments.UI:Take information-architecture inspiration from modern DigiCampus-style campus management systems: role-specific dashboards, centralized records, attendance, academics, assessments, analytics and reports. Do not copy branding/code. Delta Squad Foundation must be the product brand. Make the UI premium, professional, responsive and animated with tasteful micro-interactions.SECURITY:Secure authentication, password hashing, server-side RBAC, ownership checks, private S3, validation, secure cookies/tokens, CORS configuration, environment variables and audit logging.QUALITY:Before declaring the application complete, test authentication, every protected API route, role permissions, attendance calculations, marks history, video upload/review, mobile responsiveness and error states. No hard-coded attendance percentages, no fake data presented as real, no unauthorized access through manually crafted API requests, and no unresolved frontend/backend route mismatches.
+20. Important Note About the Subject List
+This brief intentionally includes only the subject names explicitly confirmed in the available requirements: Physics, Mathematics, SSB and JEE. If the client has a longer original list, it should be inserted exactly as supplied before implementation rather than reconstructed from unrelated college-subject screenshots.
+Delta Squad Foundation — Developer Handoff

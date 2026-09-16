@@ -1,0 +1,15 @@
+.env
+backend/.env
+frontend/.env
+backend/uploads/
+backend/public/
+frontend/dist/
+node_modules/
+**/node_modules/
+__pycache__/
+.pytest_cache/
+.env.test
+test-results/
+screenshots/
+reports/
+logs/

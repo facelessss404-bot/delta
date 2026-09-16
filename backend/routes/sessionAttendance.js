@@ -1,0 +1,13 @@
+const express = require('express');
+const { protect, authorize } = require('../middleware/authMiddleware');
+const { createSession, getSessions, getSessionRecords, getEligibleCadets, bulkRecords, updateRecord, getMyAttendance } = require('../controllers/sessionAttendanceController');
+const router = express.Router();
+router.get('/sessions', protect, getSessions);
+router.get('/sessions/:sessionId/records', protect, authorize('admin', 'commander'), getSessionRecords);
+router.post('/sessions', protect, authorize('admin', 'commander'), createSession);
+router.get('/cadets', protect, authorize('admin', 'commander'), getEligibleCadets);
+router.post('/records/bulk', protect, authorize('admin', 'commander'), bulkRecords);
+router.patch('/records/:id', protect, authorize('admin', 'commander'), updateRecord);
+router.get('/my', protect, getMyAttendance);
+router.get('/cadet/:cadetId', protect, authorize('admin', 'commander'), getMyAttendance);
+module.exports = router;
