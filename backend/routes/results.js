@@ -7,5 +7,5 @@ const { requireAdminOrCommander, requireAdmin } = require('../middleware/roleGua
 router.get('/', requireAdminOrCommander, getResults);
 router.get('/me', protect, getMyResults);
 router.post('/', requireAdminOrCommander, upsertResult);
-router.delete('/:id', requireAdmin, deleteResult);
+router.delete('/:id', requireAdminOrCommander, deleteResult);
 module.exports = router;

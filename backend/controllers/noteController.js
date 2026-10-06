@@ -32,7 +32,7 @@ const deleteNote = async (req, res) => {
     const result = await pool.query('SELECT * FROM notes WHERE id=$1', [req.params.id]);
     if (!result.rows.length) return res.status(404).json({ message: 'Note not found' });
     const note = result.rows[0];
-    if (req.user.role !== 'admin' && note.uploaded_by !== req.user.id) return res.status(403).json({ message: 'Not authorized' });
+    if (!['admin', 'commander'].includes(req.user.role) && note.uploaded_by !== req.user.id) return res.status(403).json({ message: 'Not authorized' });
     await storage.removeObject({ bucket: notesBucket(), key: note.file_path });
     await pool.query('DELETE FROM notes WHERE id=$1', [note.id]);
     res.json({ message: 'Note deleted' });

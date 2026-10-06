@@ -94,7 +94,7 @@ const MarkRow = ({ mark }) => {
 };
 
 /* ── Alert row ─────────────────────────────────────────────────── */
-const AlertRow = ({ alert, index }) => (
+const AlertRow = ({ alert }) => (
   <div style={{
     borderRadius: 10, padding: '10px 14px',
     background: 'linear-gradient(135deg, rgba(201,168,76,.07), rgba(201,168,76,.03))',
