@@ -19,7 +19,9 @@ app.disable('etag');
 app.set('trust proxy', 1);
 
 // ---------- CORS ----------
-const origins = (process.env.FRONTEND_ORIGIN || 'http://localhost:5173,http://127.0.0.1:5173').split(',').map(o => o.trim());
+const origins = (process.env.FRONTEND_ORIGIN || 'http://localhost:5173,http://127.0.0.1:5173')
+  .split(',')
+  .map(o => o.trim().replace(/\/+$/, ''));
 app.use(cors({
   origin: origins,
   credentials: true,
