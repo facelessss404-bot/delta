@@ -1,6 +1,6 @@
-# Render.com Blueprint — Delta Squad Foundation
+# Render.com Blueprint — Delta Squad Foundation (Backend API)
+# Frontend is deployed separately on Netlify.
 # Deploy: Connect this repo on https://dashboard.render.com → New → Blueprint
-# Or create a Web Service manually with these settings.
 
 services:
   - type: web
@@ -8,9 +8,10 @@ services:
     runtime: node
     region: singapore          # Closest to Supabase AP-Southeast-2
     plan: free                 # Free tier (750 hrs/mo)
-    buildCommand: npm run build
-    startCommand: npm start
+    buildCommand: cd backend && npm install
+    startCommand: cd backend && node server.js
     healthCheckPath: /api/health
+    autoDeploy: true
     envVars:
       - key: NODE_ENV
         value: production
@@ -27,8 +28,11 @@ services:
       - key: SUPABASE_VIDEOS_BUCKET
         value: physical-videos
       - key: DB_POOL_MAX
-        value: "4"
+        value: "5"
       - key: JWT_SECRET
         generateValue: true    # Render auto-generates a secure secret
       - key: FRONTEND_ORIGIN
-        sync: false            # Set to your Render URL, e.g. https://delta-squad.onrender.com
+        sync: false            # Set to your Netlify URL, e.g. https://delta-squad.netlify.app
+      - key: RENDER_EXTERNAL_URL
+        sync: false            # Set to https://delta-squad.onrender.com (for keep-alive pings)
+

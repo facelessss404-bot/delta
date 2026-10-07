@@ -2,6 +2,7 @@ require('dotenv').config();
 const path = require('path');
 const express = require('express');
 const cors = require('cors');
+const { createServer } = require('http');
 const pool = require('./config/db');
 const rateLimit = require('./middleware/rateLimit');
 const sendMail = require('./utils/mailer');
@@ -16,13 +17,79 @@ app.disable('x-powered-by');
 // causes the client to clear its session after a reload or route change.
 app.disable('etag');
 app.set('trust proxy', 1);
-const origins = (process.env.FRONTEND_ORIGIN || 'http://localhost:5173,http://127.0.0.1:5173').split(',');
-app.use((req,res,next)=>{res.setHeader('X-Content-Type-Options','nosniff');res.setHeader('X-Frame-Options','DENY');res.setHeader('Referrer-Policy','strict-origin-when-cross-origin');next();});
-app.use((req, res, next) => { const started = process.hrtime.bigint(); const end = res.end; res.end = function endWithTiming(...args) { if (!res.headersSent) { const duration = Number(process.hrtime.bigint() - started) / 1e6; res.setHeader('Server-Timing', `app;dur=${duration.toFixed(1)}`); } return end.apply(this, args); }; res.on('finish', () => { const duration = Number(process.hrtime.bigint() - started) / 1e6; console.info(`${req.method} ${req.originalUrl} ${res.statusCode} ${duration.toFixed(1)}ms`); }); next(); });
-app.use(cors({ origin: origins, credentials: true })); app.use(rateLimit());
-app.use(express.json());
-app.get('/api/health', async (_req, res) => { try { await pool.query('SELECT 1'); res.json({ ok: true, database: 'supabase_postgresql', timestamp: new Date().toISOString() }); } catch (_error) { res.status(503).json({ ok: false, database: 'unavailable' }); } });
-app.use('/api/auth', rateLimit({ windowMs: 15 * 60 * 1000, max: 20 }), require('./routes/authRoutes')); app.use('/api/auth', require('./routes/passwordReset')); app.use('/api/cadets', require('./routes/cadetRoutes')); app.use('/api/admins', require('./routes/adminRoutes')); app.use('/api/subjects', require('./routes/subjectRoutes')); app.use('/api/attendance', require('./routes/sessionAttendance')); app.use('/api/legacy-attendance', require('./routes/attendanceRoutes')); app.use('/api/academics', require('./routes/academics')); app.use('/api/dashboard', require('./routes/dashboardRoutes')); app.use('/api/physical', require('./routes/physical')); app.use('/api/counselling-registrations', require('./routes/registrationRoutes')); app.use('/api/notices', require('./routes/notices')); app.use('/api/notes', require('./routes/notes')); app.use('/api/exams', require('./routes/exams')); app.use('/api/results', require('./routes/results')); app.use('/api/leaves', require('./routes/leaves')); app.use('/api/reports', require('./routes/reportRoutes')); app.use('/api/audit-logs', require('./routes/auditRoutes')); app.use('/api/settings', require('./routes/settings')); app.use('/api/notifications', require('./routes/notifications'));
+
+// ---------- CORS ----------
+const origins = (process.env.FRONTEND_ORIGIN || 'http://localhost:5173,http://127.0.0.1:5173').split(',').map(o => o.trim());
+app.use(cors({
+  origin: origins,
+  credentials: true,
+  // Cache preflight requests for 24h to reduce OPTIONS round-trips
+  maxAge: 86400,
+}));
+
+// ---------- Security headers ----------
+app.use((req, res, next) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.setHeader('X-XSS-Protection', '0');
+  next();
+});
+
+// ---------- Response timing ----------
+app.use((req, res, next) => {
+  const started = process.hrtime.bigint();
+  const end = res.end;
+  res.end = function endWithTiming(...args) {
+    if (!res.headersSent) {
+      const duration = Number(process.hrtime.bigint() - started) / 1e6;
+      res.setHeader('Server-Timing', `app;dur=${duration.toFixed(1)}`);
+    }
+    return end.apply(this, args);
+  };
+  res.on('finish', () => {
+    const duration = Number(process.hrtime.bigint() - started) / 1e6;
+    console.info(`${req.method} ${req.originalUrl} ${res.statusCode} ${duration.toFixed(1)}ms`);
+  });
+  next();
+});
+
+// ---------- Body parsing & rate limiting ----------
+app.use(rateLimit());
+app.use(express.json({ limit: '2mb' }));
+
+// ---------- Health check (keep-alive endpoint) ----------
+app.get('/api/health', async (_req, res) => {
+  try {
+    await pool.query('SELECT 1');
+    res.json({ ok: true, database: 'supabase_postgresql', timestamp: new Date().toISOString(), uptime: process.uptime() });
+  } catch (_error) {
+    res.status(503).json({ ok: false, database: 'unavailable' });
+  }
+});
+
+// ---------- API routes ----------
+app.use('/api/auth', rateLimit({ windowMs: 15 * 60 * 1000, max: 20 }), require('./routes/authRoutes'));
+app.use('/api/auth', require('./routes/passwordReset'));
+app.use('/api/cadets', require('./routes/cadetRoutes'));
+app.use('/api/admins', require('./routes/adminRoutes'));
+app.use('/api/subjects', require('./routes/subjectRoutes'));
+app.use('/api/attendance', require('./routes/sessionAttendance'));
+app.use('/api/legacy-attendance', require('./routes/attendanceRoutes'));
+app.use('/api/academics', require('./routes/academics'));
+app.use('/api/dashboard', require('./routes/dashboardRoutes'));
+app.use('/api/physical', require('./routes/physical'));
+app.use('/api/counselling-registrations', require('./routes/registrationRoutes'));
+app.use('/api/notices', require('./routes/notices'));
+app.use('/api/notes', require('./routes/notes'));
+app.use('/api/exams', require('./routes/exams'));
+app.use('/api/results', require('./routes/results'));
+app.use('/api/leaves', require('./routes/leaves'));
+app.use('/api/reports', require('./routes/reportRoutes'));
+app.use('/api/audit-logs', require('./routes/auditRoutes'));
+app.use('/api/settings', require('./routes/settings'));
+app.use('/api/notifications', require('./routes/notifications'));
+
 // ---------- Static frontend serving (production) ----------
 const fs = require('fs');
 const hasClientBuild = fs.existsSync(path.join(clientDir, 'index.html'));
@@ -35,8 +102,28 @@ if (hasClientBuild) {
   app.get('/', (_req, res) => res.json({ name: 'Delta Squad API', database: 'Supabase PostgreSQL', note: 'Frontend not bundled — run the build script or deploy via Render.' }));
 }
 
-app.use((error, _req, res, _next) => { console.error(error.message); res.status(500).json({ message: 'Internal server error' }); });
+// ---------- Global error handler ----------
+app.use((error, _req, res, _next) => {
+  console.error(error.message);
+  res.status(error.status || 500).json({ message: 'Internal server error' });
+});
 
+// ---------- Keep-alive ping (prevents Render free tier cold starts) ----------
+const keepAlive = () => {
+  const renderUrl = process.env.RENDER_EXTERNAL_URL || process.env.FRONTEND_ORIGIN;
+  if (!renderUrl || process.env.NODE_ENV !== 'production') return;
+  // Ping own health endpoint every 14 minutes (Render sleeps after 15 min idle)
+  const INTERVAL = 14 * 60 * 1000;
+  const selfUrl = process.env.RENDER_EXTERNAL_URL
+    ? `${process.env.RENDER_EXTERNAL_URL}/api/health`
+    : `http://localhost:${process.env.PORT || 5000}/api/health`;
+  setInterval(() => {
+    fetch(selfUrl).catch(() => { /* ignore — the request itself keeps the server awake */ });
+  }, INTERVAL);
+  console.log(`Keep-alive ping configured (every ${INTERVAL / 60000} min)`);
+};
+
+// ---------- Start server ----------
 if (require.main === module) {
   const port = process.env.PORT || 5000;
   pool.query('SELECT 1').then(async () => {
@@ -45,6 +132,7 @@ if (require.main === module) {
     // so the server socket is open before we proceed, keeping the event loop alive.
     const server = await app.listen(port);
     console.log(`Delta Squad API listening on ${port}`);
+    keepAlive();
     const shutdown = async (signal) => {
       console.log(`${signal} received, shutting down gracefully...`);
       server.close(async () => { await pool.end(); process.exit(0); });
@@ -54,3 +142,4 @@ if (require.main === module) {
   }).catch((error) => { console.error('Supabase PostgreSQL connection failed:', error.message); process.exit(1); });
 }
 module.exports = app;
+
