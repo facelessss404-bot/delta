@@ -38,20 +38,21 @@ async function runE2E() {
   // 2. Test Cadet Login and Endpoints
   console.log('\n[2] Testing Cadet (cadet@cadet.com)...');
   const cadetAuth = await login('cadet@cadet.com', 'password123');
-  console.log(`Cadet logged in successfully! User: ${cadetAuth.user.name}, Role: ${cadetAuth.user.role}`);
+  const cadetUser = cadetAuth.user || cadetAuth;
+  console.log(`Cadet logged in successfully! User: ${cadetUser.name}, Role: ${cadetUser.role}`);
   const cadetHeaders = { Authorization: `Bearer ${cadetAuth.token}` };
 
   const cadetMe = await request('/auth/me', { headers: cadetHeaders });
   console.log('Cadet /auth/me:', cadetMe.status, cadetMe.data?.email);
 
-  const cadetProfile = await request(`/cadets/${cadetAuth.user.id}`, { headers: cadetHeaders });
+  const cadetProfile = await request(`/cadets/${cadetUser.id}`, { headers: cadetHeaders });
   console.log('Cadet Profile:', cadetProfile.status, cadetProfile.data?.name);
 
-  const cadetSubjects = await request(`/cadets/${cadetAuth.user.id}/subjects`, { headers: cadetHeaders });
+  const cadetSubjects = await request(`/cadets/${cadetUser.id}/subjects`, { headers: cadetHeaders });
   console.log('Cadet Subjects count:', cadetSubjects.status, Array.isArray(cadetSubjects.data) ? cadetSubjects.data.length : 'N/A');
 
   const cadetAttendance = await request('/attendance/my', { headers: cadetHeaders });
-  console.log('Cadet Attendance /my:', cadetAttendance.status, Array.isArray(cadetAttendance.data) ? cadetAttendance.data.length : 'N/A');
+  console.log('Cadet Attendance /my:', cadetAttendance.status, Array.isArray(cadetAttendance.data?.summary || cadetAttendance.data) ? (cadetAttendance.data?.summary?.length || cadetAttendance.data?.length) : 'N/A');
 
   const cadetMarks = await request('/academics/marks/my', { headers: cadetHeaders });
   console.log('Cadet Marks /my:', cadetMarks.status, Array.isArray(cadetMarks.data) ? cadetMarks.data.length : 'N/A');
@@ -71,7 +72,8 @@ async function runE2E() {
   // 3. Test Admin Login and Endpoints
   console.log('\n[3] Testing Admin (admin@admin.com)...');
   const adminAuth = await login('admin@admin.com', 'password123');
-  console.log(`Admin logged in successfully! User: ${adminAuth.user.name}, Role: ${adminAuth.user.role}`);
+  const adminUser = adminAuth.user || adminAuth;
+  console.log(`Admin logged in successfully! User: ${adminUser.name}, Role: ${adminUser.role}`);
   const adminHeaders = { Authorization: `Bearer ${adminAuth.token}` };
 
   const adminCadets = await request('/cadets', { headers: adminHeaders });
@@ -95,7 +97,8 @@ async function runE2E() {
   // 4. Test Commander Login and Endpoints
   console.log('\n[4] Testing Commander (commander@commander.com)...');
   const cmdAuth = await login('commander@commander.com', 'password123');
-  console.log(`Commander logged in successfully! User: ${cmdAuth.user.name}, Role: ${cmdAuth.user.role}`);
+  const cmdUser = cmdAuth.user || cmdAuth;
+  console.log(`Commander logged in successfully! User: ${cmdUser.name}, Role: ${cmdUser.role}`);
   const cmdHeaders = { Authorization: `Bearer ${cmdAuth.token}` };
 
   const cmdAdmins = await request('/admins', { headers: cmdHeaders });

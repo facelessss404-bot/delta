@@ -4,7 +4,12 @@ import { AuthContext } from '../context/authStateContext';
 import VideoUpload from '../components/VideoUpload';
 import api from '../services/api';
 
-const displayDate = (value) => value ? new Date(`${value}T00:00:00`).toLocaleDateString() : '—';
+const displayDate = (value) => {
+  if (!value) return '—';
+  const str = String(value).split('T')[0];
+  const d = new Date(`${str}T00:00:00`);
+  return !isNaN(d.getTime()) ? d.toLocaleDateString() : new Date(value).toLocaleDateString();
+};
 
 export default function PhysicalTraining() {
   const { user } = useContext(AuthContext);

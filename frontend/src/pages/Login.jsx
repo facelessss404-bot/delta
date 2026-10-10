@@ -393,6 +393,57 @@ const Login = () => {
           </div>
 
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            {/* Quick Demo Logins for tomorrow's handover presentation */}
+            <div style={{ marginBottom: 4 }}>
+              <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgba(201,168,76,0.85)', marginBottom: 8, textAlign: 'center' }}>
+                Quick Demo Access (1-Click)
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 6 }}>
+                <button
+                  type="button"
+                  data-testid="demo-login-commander"
+                  onClick={() => { setEmail('commander@commander.com'); setPassword('password123'); setError(''); }}
+                  style={{
+                    padding: '8px 4px', fontSize: 11, fontWeight: 700, borderRadius: 8,
+                    border: email === 'commander@commander.com' ? '1px solid #C9A84C' : '1px solid rgba(255,255,255,0.1)',
+                    background: email === 'commander@commander.com' ? 'rgba(201,168,76,0.2)' : 'rgba(255,255,255,0.03)',
+                    color: email === 'commander@commander.com' ? '#C9A84C' : 'rgba(245,245,240,0.7)',
+                    cursor: 'pointer', transition: 'all 150ms ease', textAlign: 'center'
+                  }}
+                >
+                  🛡️ Commander
+                </button>
+                <button
+                  type="button"
+                  data-testid="demo-login-admin"
+                  onClick={() => { setEmail('admin@admin.com'); setPassword('password123'); setError(''); }}
+                  style={{
+                    padding: '8px 4px', fontSize: 11, fontWeight: 700, borderRadius: 8,
+                    border: email === 'admin@admin.com' ? '1px solid #C9A84C' : '1px solid rgba(255,255,255,0.1)',
+                    background: email === 'admin@admin.com' ? 'rgba(201,168,76,0.2)' : 'rgba(255,255,255,0.03)',
+                    color: email === 'admin@admin.com' ? '#C9A84C' : 'rgba(245,245,240,0.7)',
+                    cursor: 'pointer', transition: 'all 150ms ease', textAlign: 'center'
+                  }}
+                >
+                  📋 Admin
+                </button>
+                <button
+                  type="button"
+                  data-testid="demo-login-cadet"
+                  onClick={() => { setEmail('cadet@cadet.com'); setPassword('password123'); setError(''); }}
+                  style={{
+                    padding: '8px 4px', fontSize: 11, fontWeight: 700, borderRadius: 8,
+                    border: email === 'cadet@cadet.com' ? '1px solid #C9A84C' : '1px solid rgba(255,255,255,0.1)',
+                    background: email === 'cadet@cadet.com' ? 'rgba(201,168,76,0.2)' : 'rgba(255,255,255,0.03)',
+                    color: email === 'cadet@cadet.com' ? '#C9A84C' : 'rgba(245,245,240,0.7)',
+                    cursor: 'pointer', transition: 'all 150ms ease', textAlign: 'center'
+                  }}
+                >
+                  🎖️ Cadet
+                </button>
+              </div>
+            </div>
+
             {error && (
               <div data-testid="login-error" style={{ background: 'rgba(248,113,113,0.08)', border: '1px solid rgba(248,113,113,0.15)', color: '#F87171', padding: '10px 14px', borderRadius: 8, fontSize: 13, textAlign: 'center', fontWeight: 500 }}>
                 {error}
