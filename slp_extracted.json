@@ -1,0 +1,686 @@
+[
+  {
+    "day": "Monday",
+    "slot_order": 1,
+    "time_raw": "500hrs",
+    "val": "WAKEUP"
+  },
+  {
+    "day": "Monday",
+    "slot_order": 2,
+    "time_raw": "0530-0730",
+    "val": "PHYSICALS"
+  },
+  {
+    "day": "Monday",
+    "slot_order": 3,
+    "time_raw": "0730-0800",
+    "val": "FRESHUP"
+  },
+  {
+    "day": "Monday",
+    "slot_order": 4,
+    "time_raw": "0800-0830",
+    "val": "FALLIN"
+  },
+  {
+    "day": "Monday",
+    "slot_order": 5,
+    "time_raw": "0830-0900",
+    "val": "BREAKFAST"
+  },
+  {
+    "day": "Monday",
+    "slot_order": 6,
+    "time_raw": "9:00\u201310:00",
+    "val": "GEO /ECO (PRIYA)"
+  },
+  {
+    "day": "Monday",
+    "slot_order": 7,
+    "time_raw": "10:00\u201311:30",
+    "val": "ENGLISH (SARANYA)"
+  },
+  {
+    "day": "Monday",
+    "slot_order": 8,
+    "time_raw": "11:30\u201311:45",
+    "val": "B"
+  },
+  {
+    "day": "Monday",
+    "slot_order": 9,
+    "time_raw": "11:45\u20131:00",
+    "val": "HISTORY (DEVIKA)"
+  },
+  {
+    "day": "Monday",
+    "slot_order": 10,
+    "time_raw": "1:00\u20131:30",
+    "val": "L"
+  },
+  {
+    "day": "Monday",
+    "slot_order": 11,
+    "time_raw": "1:30\u20132:30",
+    "val": "SELF    PREPARATION"
+  },
+  {
+    "day": "Monday",
+    "slot_order": 12,
+    "time_raw": "2:30\u20133:45",
+    "val": "MATHS (THEIVARSU)"
+  },
+  {
+    "day": "Monday",
+    "slot_order": 13,
+    "time_raw": "3:45\u20134:00",
+    "val": "B"
+  },
+  {
+    "day": "Monday",
+    "slot_order": 14,
+    "time_raw": "4:00\u20135:00",
+    "val": "LEARNING VIDEOS"
+  },
+  {
+    "day": "Monday",
+    "slot_order": 15,
+    "time_raw": "5:00\u20136:00",
+    "val": "CURRENT AFFAIRS"
+  },
+  {
+    "day": "Monday",
+    "slot_order": 16,
+    "time_raw": "1800-2030",
+    "val": "SELF STUDY"
+  },
+  {
+    "day": "Monday",
+    "slot_order": 17,
+    "time_raw": "2030-2100",
+    "val": "DINNER"
+  },
+  {
+    "day": "Monday",
+    "slot_order": 18,
+    "time_raw": "2100-2230",
+    "val": "STUDY HOURS"
+  },
+  {
+    "day": "Monday",
+    "slot_order": 19,
+    "time_raw": "2230hrs",
+    "val": "LIGHTSOFF"
+  },
+  {
+    "day": "Tuesday",
+    "slot_order": 1,
+    "time_raw": "500hrs",
+    "val": "WAKEUP"
+  },
+  {
+    "day": "Tuesday",
+    "slot_order": 2,
+    "time_raw": "0530-0730",
+    "val": "PHYSICALS"
+  },
+  {
+    "day": "Tuesday",
+    "slot_order": 3,
+    "time_raw": "0730-0800",
+    "val": "FRESHUP"
+  },
+  {
+    "day": "Tuesday",
+    "slot_order": 4,
+    "time_raw": "0800-0830",
+    "val": "FALLIN"
+  },
+  {
+    "day": "Tuesday",
+    "slot_order": 5,
+    "time_raw": "0830-0900",
+    "val": "BREAKFAST"
+  },
+  {
+    "day": "Tuesday",
+    "slot_order": 6,
+    "time_raw": "9:00\u201310:00",
+    "val": "GEO /ECO (PRIYA)"
+  },
+  {
+    "day": "Tuesday",
+    "slot_order": 7,
+    "time_raw": "10:00\u201311:30",
+    "val": "MATHS (THEIVARSU)"
+  },
+  {
+    "day": "Tuesday",
+    "slot_order": 8,
+    "time_raw": "11:30\u201311:45",
+    "val": "R"
+  },
+  {
+    "day": "Tuesday",
+    "slot_order": 9,
+    "time_raw": "11:45\u20131:00",
+    "val": "ENGLISH (SARANYA)"
+  },
+  {
+    "day": "Tuesday",
+    "slot_order": 10,
+    "time_raw": "1:00\u20131:30",
+    "val": "U"
+  },
+  {
+    "day": "Tuesday",
+    "slot_order": 11,
+    "time_raw": "1:30\u20132:30",
+    "val": null
+  },
+  {
+    "day": "Tuesday",
+    "slot_order": 12,
+    "time_raw": "2:30\u20133:45",
+    "val": "HISTORY (DEVIKA)"
+  },
+  {
+    "day": "Tuesday",
+    "slot_order": 13,
+    "time_raw": "3:45\u20134:00",
+    "val": "R"
+  },
+  {
+    "day": "Tuesday",
+    "slot_order": 14,
+    "time_raw": "4:00\u20135:00",
+    "val": null
+  },
+  {
+    "day": "Tuesday",
+    "slot_order": 15,
+    "time_raw": "5:00\u20136:00",
+    "val": null
+  },
+  {
+    "day": "Tuesday",
+    "slot_order": 16,
+    "time_raw": "1800-2030",
+    "val": "SELF STUDY"
+  },
+  {
+    "day": "Tuesday",
+    "slot_order": 17,
+    "time_raw": "2030-2100",
+    "val": "DINNER"
+  },
+  {
+    "day": "Tuesday",
+    "slot_order": 18,
+    "time_raw": "2100-2230",
+    "val": "STUDY HOURS"
+  },
+  {
+    "day": "Tuesday",
+    "slot_order": 19,
+    "time_raw": "2230hrs",
+    "val": "LIGHTSOFF"
+  },
+  {
+    "day": "Wednesday",
+    "slot_order": 1,
+    "time_raw": "500hrs",
+    "val": "WAKEUP"
+  },
+  {
+    "day": "Wednesday",
+    "slot_order": 2,
+    "time_raw": "0530-0730",
+    "val": "PHYSICALS"
+  },
+  {
+    "day": "Wednesday",
+    "slot_order": 3,
+    "time_raw": "0730-0800",
+    "val": "FRESHUP"
+  },
+  {
+    "day": "Wednesday",
+    "slot_order": 4,
+    "time_raw": "0800-0830",
+    "val": "FALLIN"
+  },
+  {
+    "day": "Wednesday",
+    "slot_order": 5,
+    "time_raw": "0830-0900",
+    "val": "BREAKFAST"
+  },
+  {
+    "day": "Wednesday",
+    "slot_order": 6,
+    "time_raw": "9:00\u201310:00",
+    "val": "GEO /ECO (PRIYA)"
+  },
+  {
+    "day": "Wednesday",
+    "slot_order": 7,
+    "time_raw": "10:00\u201311:30",
+    "val": "POLITY (DEVIKA)"
+  },
+  {
+    "day": "Wednesday",
+    "slot_order": 8,
+    "time_raw": "11:30\u201311:45",
+    "val": "E"
+  },
+  {
+    "day": "Wednesday",
+    "slot_order": 9,
+    "time_raw": "11:45\u20131:00",
+    "val": "BIOLOGY (RITHIKA)"
+  },
+  {
+    "day": "Wednesday",
+    "slot_order": 10,
+    "time_raw": "1:00\u20131:30",
+    "val": "N"
+  },
+  {
+    "day": "Wednesday",
+    "slot_order": 11,
+    "time_raw": "1:30\u20132:30",
+    "val": null
+  },
+  {
+    "day": "Wednesday",
+    "slot_order": 12,
+    "time_raw": "2:30\u20133:45",
+    "val": "ENGLISH (SARANYA)"
+  },
+  {
+    "day": "Wednesday",
+    "slot_order": 13,
+    "time_raw": "3:45\u20134:00",
+    "val": "E"
+  },
+  {
+    "day": "Wednesday",
+    "slot_order": 14,
+    "time_raw": "4:00\u20135:00",
+    "val": null
+  },
+  {
+    "day": "Wednesday",
+    "slot_order": 15,
+    "time_raw": "5:00\u20136:00",
+    "val": null
+  },
+  {
+    "day": "Wednesday",
+    "slot_order": 16,
+    "time_raw": "1800-2030",
+    "val": "SELF STUDY"
+  },
+  {
+    "day": "Wednesday",
+    "slot_order": 17,
+    "time_raw": "2030-2100",
+    "val": "DINNER"
+  },
+  {
+    "day": "Wednesday",
+    "slot_order": 18,
+    "time_raw": "2100-2230",
+    "val": "STUDY HOURS"
+  },
+  {
+    "day": "Wednesday",
+    "slot_order": 19,
+    "time_raw": "2230hrs",
+    "val": "LIGHTSOFF"
+  },
+  {
+    "day": "Thursday",
+    "slot_order": 1,
+    "time_raw": "500hrs",
+    "val": "WAKEUP"
+  },
+  {
+    "day": "Thursday",
+    "slot_order": 2,
+    "time_raw": "0530-0730",
+    "val": "PHYSICALS"
+  },
+  {
+    "day": "Thursday",
+    "slot_order": 3,
+    "time_raw": "0730-0800",
+    "val": "FRESHUP"
+  },
+  {
+    "day": "Thursday",
+    "slot_order": 4,
+    "time_raw": "0800-0830",
+    "val": "FALLIN"
+  },
+  {
+    "day": "Thursday",
+    "slot_order": 5,
+    "time_raw": "0830-0900",
+    "val": "BREAKFAST"
+  },
+  {
+    "day": "Thursday",
+    "slot_order": 6,
+    "time_raw": "9:00\u201310:00",
+    "val": "GEO /ECO (PRIYA)"
+  },
+  {
+    "day": "Thursday",
+    "slot_order": 7,
+    "time_raw": "10:00\u201311:30",
+    "val": "BIOLOGY (RITHIKA)"
+  },
+  {
+    "day": "Thursday",
+    "slot_order": 8,
+    "time_raw": "11:30\u201311:45",
+    "val": "A"
+  },
+  {
+    "day": "Thursday",
+    "slot_order": 9,
+    "time_raw": "11:45\u20131:00",
+    "val": "MATHS (THEIVARSU)"
+  },
+  {
+    "day": "Thursday",
+    "slot_order": 10,
+    "time_raw": "1:00\u20131:30",
+    "val": "C"
+  },
+  {
+    "day": "Thursday",
+    "slot_order": 11,
+    "time_raw": "1:30\u20132:30",
+    "val": null
+  },
+  {
+    "day": "Thursday",
+    "slot_order": 12,
+    "time_raw": "2:30\u20133:45",
+    "val": "BIOLOGY (RITHIKA)"
+  },
+  {
+    "day": "Thursday",
+    "slot_order": 13,
+    "time_raw": "3:45\u20134:00",
+    "val": "A"
+  },
+  {
+    "day": "Thursday",
+    "slot_order": 14,
+    "time_raw": "4:00\u20135:00",
+    "val": null
+  },
+  {
+    "day": "Thursday",
+    "slot_order": 15,
+    "time_raw": "5:00\u20136:00",
+    "val": null
+  },
+  {
+    "day": "Thursday",
+    "slot_order": 16,
+    "time_raw": "1800-2030",
+    "val": "SELF STUDY"
+  },
+  {
+    "day": "Thursday",
+    "slot_order": 17,
+    "time_raw": "2030-2100",
+    "val": "DINNER"
+  },
+  {
+    "day": "Thursday",
+    "slot_order": 18,
+    "time_raw": "2100-2230",
+    "val": "STUDY HOURS"
+  },
+  {
+    "day": "Thursday",
+    "slot_order": 19,
+    "time_raw": "2230hrs",
+    "val": "LIGHTSOFF"
+  },
+  {
+    "day": "Friday",
+    "slot_order": 1,
+    "time_raw": "500hrs",
+    "val": "WAKEUP"
+  },
+  {
+    "day": "Friday",
+    "slot_order": 2,
+    "time_raw": "0530-0730",
+    "val": "PHYSICALS"
+  },
+  {
+    "day": "Friday",
+    "slot_order": 3,
+    "time_raw": "0730-0800",
+    "val": "FRESHUP"
+  },
+  {
+    "day": "Friday",
+    "slot_order": 4,
+    "time_raw": "0800-0830",
+    "val": "FALLIN"
+  },
+  {
+    "day": "Friday",
+    "slot_order": 5,
+    "time_raw": "0830-0900",
+    "val": "BREAKFAST"
+  },
+  {
+    "day": "Friday",
+    "slot_order": 6,
+    "time_raw": "9:00\u201310:00",
+    "val": "GEO /ECO (PRIYA)"
+  },
+  {
+    "day": "Friday",
+    "slot_order": 7,
+    "time_raw": "10:00\u201311:30",
+    "val": "HISTORY (DEVIKA)"
+  },
+  {
+    "day": "Friday",
+    "slot_order": 8,
+    "time_raw": "11:30\u201311:45",
+    "val": "K"
+  },
+  {
+    "day": "Friday",
+    "slot_order": 9,
+    "time_raw": "11:45\u20131:00",
+    "val": "SELF PREPARATION"
+  },
+  {
+    "day": "Friday",
+    "slot_order": 10,
+    "time_raw": "1:00\u20131:30",
+    "val": "H"
+  },
+  {
+    "day": "Friday",
+    "slot_order": 11,
+    "time_raw": "1:30\u20132:30",
+    "val": null
+  },
+  {
+    "day": "Friday",
+    "slot_order": 12,
+    "time_raw": "2:30\u20133:45",
+    "val": "ENGLISH TEST (SARANYA)"
+  },
+  {
+    "day": "Friday",
+    "slot_order": 13,
+    "time_raw": "3:45\u20134:00",
+    "val": "K"
+  },
+  {
+    "day": "Friday",
+    "slot_order": 14,
+    "time_raw": "4:00\u20135:00",
+    "val": null
+  },
+  {
+    "day": "Friday",
+    "slot_order": 15,
+    "time_raw": "5:00\u20136:00",
+    "val": null
+  },
+  {
+    "day": "Friday",
+    "slot_order": 16,
+    "time_raw": "1800-2030",
+    "val": "SELF STUDY"
+  },
+  {
+    "day": "Friday",
+    "slot_order": 17,
+    "time_raw": "2030-2100",
+    "val": "DINNER"
+  },
+  {
+    "day": "Friday",
+    "slot_order": 18,
+    "time_raw": "2100-2230",
+    "val": "STUDY HOURS"
+  },
+  {
+    "day": "Friday",
+    "slot_order": 19,
+    "time_raw": "2230hrs",
+    "val": "LIGHTSOFF"
+  },
+  {
+    "day": "Saturday",
+    "slot_order": 1,
+    "time_raw": "500hrs",
+    "val": "WAKEUP"
+  },
+  {
+    "day": "Saturday",
+    "slot_order": 2,
+    "time_raw": "0530-0730",
+    "val": "PHYSICALS"
+  },
+  {
+    "day": "Saturday",
+    "slot_order": 3,
+    "time_raw": "0730-0800",
+    "val": "FRESHUP"
+  },
+  {
+    "day": "Saturday",
+    "slot_order": 4,
+    "time_raw": "0800-0830",
+    "val": "FALLIN"
+  },
+  {
+    "day": "Saturday",
+    "slot_order": 5,
+    "time_raw": "0830-0900",
+    "val": "BREAKFAST"
+  },
+  {
+    "day": "Saturday",
+    "slot_order": 6,
+    "time_raw": "9:00\u201310:00",
+    "val": "GEO /ECO (PRIYA)"
+  },
+  {
+    "day": "Saturday",
+    "slot_order": 7,
+    "time_raw": "10:00\u201311:30",
+    "val": "MATHS (THEIVARSU)"
+  },
+  {
+    "day": "Saturday",
+    "slot_order": 8,
+    "time_raw": "11:30\u201311:45",
+    "val": null
+  },
+  {
+    "day": "Saturday",
+    "slot_order": 9,
+    "time_raw": "11:45\u20131:00",
+    "val": "POLITY (DEVIKA)"
+  },
+  {
+    "day": "Saturday",
+    "slot_order": 10,
+    "time_raw": "1:00\u20131:30",
+    "val": null
+  },
+  {
+    "day": "Saturday",
+    "slot_order": 11,
+    "time_raw": "1:30\u20132:30",
+    "val": null
+  },
+  {
+    "day": "Saturday",
+    "slot_order": 12,
+    "time_raw": "2:30\u20133:45",
+    "val": "MATHS (THEIVARSU)"
+  },
+  {
+    "day": "Saturday",
+    "slot_order": 13,
+    "time_raw": "3:45\u20134:00",
+    "val": null
+  },
+  {
+    "day": "Saturday",
+    "slot_order": 14,
+    "time_raw": "4:00\u20135:00",
+    "val": null
+  },
+  {
+    "day": "Saturday",
+    "slot_order": 15,
+    "time_raw": "5:00\u20136:00",
+    "val": null
+  },
+  {
+    "day": "Saturday",
+    "slot_order": 16,
+    "time_raw": "1800-2030",
+    "val": null
+  },
+  {
+    "day": "Saturday",
+    "slot_order": 17,
+    "time_raw": "2030-2100",
+    "val": null
+  },
+  {
+    "day": "Saturday",
+    "slot_order": 18,
+    "time_raw": "2100-2230",
+    "val": null
+  },
+  {
+    "day": "Saturday",
+    "slot_order": 19,
+    "time_raw": "2230hrs",
+    "val": null
+  }
+]

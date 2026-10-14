@@ -32,15 +32,14 @@ const cadetSignUp = async (req, res) => {
     if (!email || !email.trim()) return res.status(400).json({ message: 'Email address is required' });
     if (!password || password.length < 8) return res.status(400).json({ message: 'Password must contain at least 8 characters' });
 
-    // Normalize category: JLB/JLP, SLB/SLP, YLB/YLP, SSLB/SSLP
+    // Normalize category: JLP (Classes 8–12), SLP (Graduates), SSLP (Online Attendees), DAH
     let normCategory = (category || 'JLP').toUpperCase().trim();
     if (normCategory === 'JLB') normCategory = 'JLP';
     if (normCategory === 'SLB') normCategory = 'SLP';
-    if (normCategory === 'YLB') normCategory = 'YLP';
     if (normCategory === 'SSLB') normCategory = 'SSLP';
 
-    if (!['JLP', 'SLP', 'YLP', 'SSLP'].includes(normCategory)) {
-      return res.status(400).json({ message: 'Invalid category. Must be one of JLB/JLP, SLB/SLP, YLB/YLP, SSLB/SSLP' });
+    if (!['JLP', 'SLP', 'SSLP', 'DAH'].includes(normCategory)) {
+      return res.status(400).json({ message: 'Invalid category. Must be one of JLP (Classes 8–12), SLP (Graduates), SSLP (Online Attendees), or DAH' });
     }
 
     await client.query('BEGIN');

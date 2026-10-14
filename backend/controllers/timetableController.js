@@ -2,17 +2,18 @@ const pool = require('../config/db');
 const { writeAudit } = require('../utils/audit');
 
 const SCHEDULE_META = [
-  { key: 'grade_8_10', title: 'Grade 8th - 10th (JLP)', programme: 'Grade 8th-10th', description: 'Junior Leaders Programme core routine & academic syllabus' },
-  { key: 'grade_11_12', title: 'Grade 11th & 12th', programme: 'Grade 11th-12th', description: 'Higher secondary senior cadet science, commerce & defence focus' },
-  { key: 'nda', title: 'NDA Foundation', programme: 'NDA Foundation', description: 'National Defence Academy foundation & officer prep curriculum' }
+  { key: 'jlp_8_10', title: 'JLP: Classes 8th–10th', programme: 'JLP', description: 'Junior Leadership Program: Classes 8th–10th foundational academics & routine' },
+  { key: 'jlp_11_12', title: 'JLP: Classes 11th–12th', programme: 'JLP', description: 'Junior Leadership Program: Classes 11th–12th higher secondary science & commerce' },
+  { key: 'slp', title: 'SLP: Graduates', programme: 'SLP', description: 'Student Leadership Program: Graduate degree holders, CDS/SSB officer coaching & physicals' }
 ];
 
 const mapProgrammeToKey = (programme) => {
-  if (!programme) return 'nda';
-  const p = programme.toLowerCase();
-  if (p.includes('8') || p.includes('10') || p.includes('jlp')) return 'grade_8_10';
-  if (p.includes('11') || p.includes('12')) return 'grade_11_12';
-  return 'nda';
+  if (!programme) return 'jlp_8_10';
+  const p = programme.toUpperCase();
+  if (p === 'SLP' || p.includes('GRADUATE')) return 'slp';
+  if (p === 'SSLP' || p.includes('ONLINE')) return 'sslp_online';
+  if (p.includes('11') || p.includes('12')) return 'jlp_11_12';
+  return 'jlp_8_10';
 };
 
 const getDayName = (dateStr) => {
@@ -50,8 +51,12 @@ const getTimetableSlots = async (req, res) => {
     const params = [];
 
     if (scheduleKey) {
-      params.push(scheduleKey);
-      query += ` AND t.schedule_key = $${params.length}`;
+      if (scheduleKey === 'jlp') {
+        query += ` AND t.schedule_key IN ('jlp', 'jlp_8_10')`;
+      } else {
+        params.push(scheduleKey);
+        query += ` AND t.schedule_key = $${params.length}`;
+      }
     }
     if (dayOfWeek) {
       params.push(dayOfWeek);
@@ -95,8 +100,35 @@ const getMyTimetable = async (req, res) => {
       [cadetId]
     );
     const profile = profileRes.rows[0] || {};
-    const scheduleKey = req.query.scheduleKey || mapProgrammeToKey(profile.programme);
-    const scheduleInfo = SCHEDULE_META.find(s => s.key === scheduleKey) || SCHEDULE_META[2];
+    const requestedKey = req.query.scheduleKey;
+    const computedKey = requestedKey || mapProgrammeToKey(profile.programme);
+
+    // SSLP is for online attendees — no timetable required
+    if (computedKey === 'sslp_online' || profile.programme === 'SSLP' || profile.programme?.toLowerCase().includes('online')) {
+      return res.json({
+        schedule: {
+          key: 'sslp',
+          title: 'SSLP: Online Attendees',
+          programme: 'SSLP',
+          description: 'Senior Student Leadership Program for online attendees. Sessions are conducted virtually via live webinars.'
+        },
+        isOnline: true,
+        message: 'No timetable is required for SSLP (Online Attendees). All training sessions are conducted virtually via scheduled live webinars and interactive coaching.',
+        cadet: {
+          id: cadetId,
+          name: profile.name,
+          email: profile.email,
+          roll_no: profile.roll_no,
+          batch: profile.batch,
+          programme: profile.programme
+        },
+        activeLeaveToday: null,
+        slots: []
+      });
+    }
+
+    const targetKey = computedKey === 'jlp' ? 'jlp_8_10' : computedKey;
+    const scheduleInfo = SCHEDULE_META.find(s => s.key === targetKey) || SCHEDULE_META[0];
 
     // Check if cadet has active approved leave today
     const todayStr = new Date().toISOString().slice(0, 10);
@@ -124,7 +156,7 @@ const getMyTimetable = async (req, res) => {
           ELSE 7
         END,
         t.slot_order ASC
-    `, [scheduleKey]);
+    `, [targetKey]);
 
     res.json({
       schedule: scheduleInfo,
@@ -149,7 +181,8 @@ const getTodaySchedule = async (req, res) => {
     const { scheduleKey, date } = req.query;
     const targetDate = date ? new Date(date) : new Date();
     const dayOfWeek = getDayName(targetDate.toISOString().slice(0, 10));
-    const targetKey = scheduleKey || 'nda';
+    let targetKey = scheduleKey || 'jlp_8_10';
+    if (targetKey === 'jlp') targetKey = 'jlp_8_10';
 
     const slotsRes = await pool.query(`
       SELECT t.*, s.name AS subject_name, s.code AS subject_code

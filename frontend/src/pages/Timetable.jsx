@@ -67,10 +67,11 @@ export default function Timetable() {
   const isStaff = ['admin', 'commander'].includes(user?.role);
 
   const [schedules, setSchedules] = useState([]);
-  const [selectedSchedule, setSelectedSchedule] = useState('nda');
+  const [selectedSchedule, setSelectedSchedule] = useState('jlp_8_10');
   const [slots, setSlots] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [onlineNotice, setOnlineNotice] = useState(null);
   const [activeLeaveToday, setActiveLeaveToday] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
@@ -90,13 +91,24 @@ export default function Timetable() {
 
       if (isCadet) {
         const myData = await getMyTimetable();
-        if (myData.schedule?.key) {
-          setSelectedSchedule(myData.schedule.key);
+        if (myData.isOnline) {
+          setOnlineNotice(myData.message || 'No timetable is required for SSLP (Online Attendees). All training sessions are conducted virtually.');
+          setSlots([]);
+        } else {
+          setOnlineNotice(null);
+          if (myData.schedule?.key) {
+            setSelectedSchedule(myData.schedule.key);
+          }
+          setSlots(myData.slots || []);
         }
-        setSlots(myData.slots || []);
         setActiveLeaveToday(myData.activeLeaveToday);
       } else {
-        const fetchedSlots = await getTimetableSlots({ scheduleKey: selectedSchedule });
+        setOnlineNotice(null);
+        const targetSchedule = selectedSchedule === 'nda' ? (scheduleList[0]?.key || 'jlp_8_10') : selectedSchedule;
+        if (targetSchedule !== selectedSchedule) {
+          setSelectedSchedule(targetSchedule);
+        }
+        const fetchedSlots = await getTimetableSlots({ scheduleKey: targetSchedule });
         setSlots(fetchedSlots);
       }
     } catch (err) {
@@ -113,6 +125,7 @@ export default function Timetable() {
   // Handle schedule switch for non-cadet or when cadet explicitly explores
   const handleScheduleChange = async (key) => {
     setSelectedSchedule(key);
+    setOnlineNotice(null);
     setLoading(true);
     try {
       const fetchedSlots = await getTimetableSlots({ scheduleKey: key });
@@ -349,6 +362,39 @@ export default function Timetable() {
         <div className="glass-panel flex min-h-[300px] items-center justify-center rounded-3xl p-10 text-white/50">
           <RefreshCw className="animate-spin text-gold mr-3" size={24} />
           Loading scheduled timetable...
+        </div>
+      ) : onlineNotice ? (
+        <div className="glass-panel flex min-h-[340px] flex-col items-center justify-center rounded-3xl p-10 text-center border border-cyan-400/25 bg-cyan-950/20">
+          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-cyan-400/10 border border-cyan-400/30 text-cyan-400 mb-4 shadow-lg shadow-cyan-500/10">
+            <Sparkles size={32} />
+          </div>
+          <span className="rounded-full border border-cyan-400/30 bg-cyan-400/10 px-3 py-1 text-xs font-bold text-cyan-300 uppercase tracking-wider mb-2">
+            Online Attendee Division (SSLP)
+          </span>
+          <h3 className="text-2xl font-black text-white max-w-lg">
+            No Routine Timetable Required
+          </h3>
+          <p className="mt-2 text-sm text-cyan-200/80 max-w-xl leading-relaxed">
+            {onlineNotice}
+          </p>
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+            <button
+              type="button"
+              onClick={() => handleScheduleChange('jlp_8_10')}
+              className="inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white/5 px-4 py-2 text-xs font-bold text-white transition hover:bg-gold/20 hover:text-gold hover:border-gold/30 cursor-pointer"
+            >
+              <BookOpen size={14} />
+              Preview JLP On-Campus Schedule
+            </button>
+            <button
+              type="button"
+              onClick={() => handleScheduleChange('slp')}
+              className="inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white/5 px-4 py-2 text-xs font-bold text-white transition hover:bg-gold/20 hover:text-gold hover:border-gold/30 cursor-pointer"
+            >
+              <GraduationCap size={14} />
+              Preview SLP On-Campus Schedule
+            </button>
+          </div>
         </div>
       ) : filteredSlots.length === 0 ? (
         <div className="glass-panel flex min-h-[250px] flex-col items-center justify-center rounded-3xl p-10 text-center">

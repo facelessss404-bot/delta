@@ -94,10 +94,10 @@ const ActivityCard = ({ icon: Icon, title, desc, index }) => (
 );
 
 const CADET_CATEGORIES = [
-  { id: 'JLP', badge: 'JLB / JLP', name: 'Junior Leadership', sub: 'Grades 8–10 Foundation', icon: GraduationCap },
-  { id: 'SLP', badge: 'SLB / SLP', name: 'Senior Leadership', sub: 'Grades 11–12 Senior', icon: BookOpen },
-  { id: 'YLP', badge: 'YLB / YLP', name: 'Youth Leadership', sub: 'NDA & Civil Prep', icon: Shield },
-  { id: 'SSLP', badge: 'SSLB / SSLP', name: 'Special SSB', sub: 'Officer Academy', icon: Award },
+  { id: 'JLP', badge: 'JLP', name: 'Junior Leadership Program', sub: 'Students in Classes 8–12', icon: GraduationCap },
+  { id: 'SLP', badge: 'SLP', name: 'Student Leadership Program', sub: 'For Graduates', icon: BookOpen },
+  { id: 'SSLP', badge: 'SSLP', name: 'Senior Student Leadership Program', sub: 'Online Attendees', icon: Shield },
+  { id: 'DAH', badge: 'DAH', name: 'Defence Aspirants Hostel', sub: 'Hostel & Residential Cadets', icon: Award },
 ];
 
 /* ─── Main Component ─── */

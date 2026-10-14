@@ -6,10 +6,10 @@ import api from '../services/api';
 // --- Configuration ---
 // TODO: confirm official program names and descriptions with team
 const PROGRAMS = [
-  { id: 'JLP', name: 'Junior Leadership Program', desc: 'Foundation training for young cadets.', icon: GraduationCap },
-  { id: 'SLP', name: 'Student Leadership Program', desc: 'Intermediate leadership development.', icon: Users },
-  { id: 'YLP', name: 'Youth Leadership Program', desc: 'Advanced skills and civil service prep.', icon: Shield },
-  { id: 'SSLP', name: 'Senior Student Leadership Program', desc: 'Pre-commissioning and elite coaching.', icon: Award },
+  { id: 'JLP', name: 'Junior Leadership Program (JLP)', desc: 'For students in Classes 8–12 (School Foundation).', icon: GraduationCap },
+  { id: 'SLP', name: 'Student Leadership Program (SLP)', desc: 'For graduates targeting officer pre-commissioning.', icon: Users },
+  { id: 'SSLP', name: 'Senior Student Leadership Program (SSLP)', desc: 'For online attendees with virtual mentoring.', icon: Shield },
+  { id: 'DAH', name: 'Defence Aspirants Hostel (DAH)', desc: 'Residential & hostel cadet division.', icon: Award },
 ];
 
 const RegistrationSection = () => {

@@ -38,6 +38,8 @@ export default function CadetDashboardFull() {
         setTodaySchedule({
           dayName: dayStr,
           scheduleTitle: myTimetableRes.schedule?.title,
+          isOnline: myTimetableRes.isOnline,
+          message: myTimetableRes.message,
           slots: todaySlots
         });
       }
@@ -99,66 +101,94 @@ export default function CadetDashboardFull() {
 
       {/* Today's Timetable Preset Schedule Widget */}
       {todaySchedule && (
-        <section className="glass-panel rounded-3xl p-6 border border-gold/20 bg-gold/[0.03]">
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-4">
-            <div>
-              <div className="flex items-center gap-2">
-                <Clock3 className="text-gold" size={18} />
-                <h2 className="text-lg font-bold text-white">
-                  Today's Schedule & Routine ({todaySchedule.dayName})
-                </h2>
+        todaySchedule.isOnline ? (
+          <section className="glass-panel rounded-3xl p-6 border border-cyan-400/25 bg-cyan-950/20">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div className="flex items-start gap-3">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-cyan-400/10 border border-cyan-400/30 text-cyan-400">
+                  <Clock3 size={22} />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h2 className="text-lg font-bold text-white">Online Attendee Division (SSLP)</h2>
+                    <span className="rounded-full border border-cyan-400/30 bg-cyan-400/10 px-2.5 py-0.5 text-[10px] font-bold text-cyan-300 uppercase">Virtual Cohort</span>
+                  </div>
+                  <p className="text-xs text-cyan-200/80 mt-1 max-w-xl leading-relaxed">
+                    {todaySchedule.message || 'No routine timetable is required for SSLP cadets. Sessions and interactive coaching are conducted virtually.'}
+                  </p>
+                </div>
               </div>
-              <p className="text-xs text-white/50 mt-0.5">
-                Division Preset: {todaySchedule.scheduleTitle} · {todaySchedule.slots.length} periods scheduled
-              </p>
+              <Link
+                to="/timetable"
+                className="inline-flex items-center gap-1.5 rounded-xl border border-white/20 bg-white/5 px-4 py-2 text-xs font-bold text-white hover:bg-gold/20 hover:text-gold hover:border-gold/30 transition shrink-0"
+              >
+                Programme Details
+                <ArrowRight size={14} />
+              </Link>
             </div>
-            <Link
-              to="/timetable"
-              className="inline-flex items-center gap-1.5 text-xs font-bold text-gold hover:text-white transition"
-            >
-              View Full Weekly Timetable
-              <ArrowRight size={14} />
-            </Link>
-          </div>
+          </section>
+        ) : (
+          <section className="glass-panel rounded-3xl p-6 border border-gold/20 bg-gold/[0.03]">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-4">
+              <div>
+                <div className="flex items-center gap-2">
+                  <Clock3 className="text-gold" size={18} />
+                  <h2 className="text-lg font-bold text-white">
+                    Today's Schedule & Routine ({todaySchedule.dayName})
+                  </h2>
+                </div>
+                <p className="text-xs text-white/50 mt-0.5">
+                  Division Preset: {todaySchedule.scheduleTitle} · {todaySchedule.slots.length} periods scheduled
+                </p>
+              </div>
+              <Link
+                to="/timetable"
+                className="inline-flex items-center gap-1.5 text-xs font-bold text-gold hover:text-white transition"
+              >
+                View Full Weekly Timetable
+                <ArrowRight size={14} />
+              </Link>
+            </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-            {todaySchedule.slots.slice(0, 8).map((slot) => {
-              const isNow = slot.start_time && slot.end_time && currentTimeStr >= slot.start_time && currentTimeStr < slot.end_time;
-              return (
-                <div
-                  key={slot.id}
-                  className={`rounded-2xl border p-3.5 transition ${
-                    isNow
-                      ? 'border-gold bg-gold/20 shadow-lg shadow-gold/15 ring-1 ring-gold text-white'
-                      : 'border-white/10 bg-black/25 text-white/70 hover:bg-white/5'
-                  }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="text-[11px] font-bold text-gold">
-                      {slot.time_display}
-                    </span>
-                    {isNow && (
-                      <span className="rounded-full bg-emerald-400/20 px-2 py-0.2 text-[9px] font-black uppercase text-emerald-300 animate-pulse">
-                        NOW
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+              {todaySchedule.slots.slice(0, 8).map((slot) => {
+                const isNow = slot.start_time && slot.end_time && currentTimeStr >= slot.start_time && currentTimeStr < slot.end_time;
+                return (
+                  <div
+                    key={slot.id}
+                    className={`rounded-2xl border p-3.5 transition ${
+                      isNow
+                        ? 'border-gold bg-gold/20 shadow-lg shadow-gold/15 ring-1 ring-gold text-white'
+                        : 'border-white/10 bg-black/25 text-white/70 hover:bg-white/5'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="text-[11px] font-bold text-gold">
+                        {slot.time_display}
                       </span>
+                      {isNow && (
+                        <span className="rounded-full bg-emerald-400/20 px-2 py-0.2 text-[9px] font-black uppercase text-emerald-300 animate-pulse">
+                          NOW
+                        </span>
+                      )}
+                    </div>
+                    <p className="font-extrabold text-sm text-white mt-1 line-clamp-1" title={slot.activity}>
+                      {slot.activity}
+                    </p>
+                    {slot.instructor ? (
+                      <p className="text-[11px] text-white/50 mt-0.5 flex items-center gap-1">
+                        <UserCheck size={11} className="text-gold" />
+                        {slot.instructor}
+                      </p>
+                    ) : (
+                      <p className="text-[11px] text-white/40 mt-0.5 italic">Academy Routine</p>
                     )}
                   </div>
-                  <p className="font-extrabold text-sm text-white mt-1 line-clamp-1" title={slot.activity}>
-                    {slot.activity}
-                  </p>
-                  {slot.instructor ? (
-                    <p className="text-[11px] text-white/50 mt-0.5 flex items-center gap-1">
-                      <UserCheck size={11} className="text-gold" />
-                      {slot.instructor}
-                    </p>
-                  ) : (
-                    <p className="text-[11px] text-white/40 mt-0.5 italic">Academy Routine</p>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </section>
+                );
+              })}
+            </div>
+          </section>
+        )
       )}
 
       {error && (

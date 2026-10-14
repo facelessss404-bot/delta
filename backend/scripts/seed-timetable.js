@@ -12,80 +12,95 @@ async function seed() {
   const rawSlots = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
   console.log(`Loading ${rawSlots.length} timetable slots...`);
 
-  // Fetch subjects to map IDs
-  const subjectsRes = await pool.query('SELECT id, name FROM subjects');
-  const subjects = subjectsRes.rows;
-  console.log(`Found ${subjects.length} subjects in database`);
-
-  const findSubjectId = (activity) => {
-    if (!activity) return null;
-    const act = activity.toUpperCase();
-    if (act.includes('PHYSICAL') || act.includes('PHSICAL') || act.includes('PT')) {
-      const match = subjects.find(s => s.name.toLowerCase().includes('physical'));
-      return match ? match.id : null;
-    }
-    if (act.includes('MATH')) {
-      const match = subjects.find(s => s.name.toLowerCase().includes('math'));
-      return match ? match.id : null;
-    }
-    if (act.includes('ENG')) {
-      const match = subjects.find(s => s.name.toLowerCase().includes('english'));
-      return match ? match.id : null;
-    }
-    if (act.includes('PHY') && !act.includes('PHYSICAL')) {
-      const match = subjects.find(s => s.name.toLowerCase().includes('physics') || s.name === 'Physics');
-      return match ? match.id : null;
-    }
-    if (act.includes('CHE')) {
-      const match = subjects.find(s => s.name.toLowerCase().includes('chem'));
-      return match ? match.id : null;
-    }
-    if (act.includes('SCIENCE')) {
-      const match = subjects.find(s => s.name.toLowerCase() === 'science');
-      return match ? match.id : null;
-    }
-    if (act.includes('SST')) {
-      const match = subjects.find(s => s.name.toLowerCase().includes('social') || s.name.toLowerCase().includes('sst'));
-      return match ? match.id : null;
-    }
-    if (act.includes('B COM') || act.includes('B.COM') || act.includes('COMMERCE')) {
-      const match = subjects.find(s => s.name.toLowerCase().includes('commerce'));
-      return match ? match.id : null;
-    }
-    if (act.includes('MILITARY HISTORY') || act.includes('MH')) {
-      const match = subjects.find(s => s.name.toLowerCase().includes('military history'));
-      return match ? match.id : null;
-    }
-    if (act.includes('PAINTING')) {
-      const match = subjects.find(s => s.name.toLowerCase().includes('painting'));
-      return match ? match.id : null;
-    }
-    if (act.includes('PYQ')) {
-      const match = subjects.find(s => s.name.toLowerCase().includes('previous year') || s.name.toLowerCase().includes('pyq'));
-      return match ? match.id : null;
-    }
-    if (act.includes('CURRENT AFFAIRS')) {
-      const match = subjects.find(s => s.name.toLowerCase().includes('general studies') || s.name.toLowerCase().includes('gk'));
-      return match ? match.id : null;
-    }
-    if (act.includes('GAMES')) {
-      const match = subjects.find(s => s.name.toLowerCase().includes('games'));
-      return match ? match.id : null;
-    }
-    if (act.includes('STUDY')) {
-      const match = subjects.find(s => s.name.toLowerCase().includes('study'));
-      return match ? match.id : null;
-    }
-    if (act.includes('NIOS')) {
-      const match = subjects.find(s => s.name.toLowerCase().includes('nios'));
-      return match ? match.id : null;
-    }
-    return null;
-  };
-
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
+
+    // Ensure standard subjects exist for SLP & JLP
+    await client.query(`
+      INSERT INTO subjects (name, code, category, active) VALUES
+        ('Geography & Economics', 'GEO-101', 'academic', true),
+        ('Polity & Governance', 'POL-101', 'academic', true),
+        ('History', 'HIS-101', 'academic', true),
+        ('Biology', 'BIO-101', 'academic', true)
+      ON CONFLICT (name) DO NOTHING
+    `);
+
+    // Fetch subjects to map IDs
+    const subjectsRes = await client.query('SELECT id, name FROM subjects');
+    const subjects = subjectsRes.rows;
+    console.log(`Found ${subjects.length} subjects in database`);
+
+    const findSubjectId = (activity) => {
+      if (!activity) return null;
+      const act = activity.toUpperCase();
+      if (act.includes('PHYSICAL') || act.includes('PHSICAL') || act.includes('PT')) {
+        const match = subjects.find(s => s.name.toLowerCase().includes('physical'));
+        return match ? match.id : null;
+      }
+      if (act.includes('MATH')) {
+        const match = subjects.find(s => s.name.toLowerCase().includes('math'));
+        return match ? match.id : null;
+      }
+      if (act.includes('ENG')) {
+        const match = subjects.find(s => s.name.toLowerCase().includes('english'));
+        return match ? match.id : null;
+      }
+      if (act.includes('PHY') && !act.includes('PHYSICAL')) {
+        const match = subjects.find(s => s.name.toLowerCase().includes('physics') || s.name === 'Physics');
+        return match ? match.id : null;
+      }
+      if (act.includes('CHE')) {
+        const match = subjects.find(s => s.name.toLowerCase().includes('chem'));
+        return match ? match.id : null;
+      }
+      if (act.includes('SCIENCE')) {
+        const match = subjects.find(s => s.name.toLowerCase() === 'science');
+        return match ? match.id : null;
+      }
+      if (act.includes('SST')) {
+        const match = subjects.find(s => s.name.toLowerCase().includes('social') || s.name.toLowerCase().includes('sst'));
+        return match ? match.id : null;
+      }
+      if (act.includes('B COM') || act.includes('B.COM') || act.includes('COMMERCE')) {
+        const match = subjects.find(s => s.name.toLowerCase().includes('commerce'));
+        return match ? match.id : null;
+      }
+      if (act.includes('GEO') || act.includes('ECO')) {
+        const match = subjects.find(s => s.name.toLowerCase().includes('geography'));
+        return match ? match.id : null;
+      }
+      if (act.includes('POLITY')) {
+        const match = subjects.find(s => s.name.toLowerCase().includes('polity'));
+        return match ? match.id : null;
+      }
+      if (act.includes('HISTORY') && !act.includes('MILITARY')) {
+        const match = subjects.find(s => s.name.toLowerCase() === 'history');
+        return match ? match.id : null;
+      }
+      if (act.includes('BIO')) {
+        const match = subjects.find(s => s.name.toLowerCase().includes('biology'));
+        return match ? match.id : null;
+      }
+      if (act.includes('MILITARY HISTORY') || act.includes('MH')) {
+        const match = subjects.find(s => s.name.toLowerCase().includes('military history'));
+        return match ? match.id : null;
+      }
+      if (act.includes('CURRENT AFFAIRS')) {
+        const match = subjects.find(s => s.name.toLowerCase().includes('general studies') || s.name.toLowerCase().includes('gk'));
+        return match ? match.id : null;
+      }
+      if (act.includes('GAMES')) {
+        const match = subjects.find(s => s.name.toLowerCase().includes('games'));
+        return match ? match.id : null;
+      }
+      if (act.includes('STUDY')) {
+        const match = subjects.find(s => s.name.toLowerCase().includes('study'));
+        return match ? match.id : null;
+      }
+      return null;
+    };
+
     await client.query('DELETE FROM timetable_slots');
 
     // Batch insert slots in chunks of 50

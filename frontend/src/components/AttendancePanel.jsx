@@ -40,7 +40,7 @@ export default function AttendancePanel() {
 
   // Timetable preset state
   const [schedules, setSchedules] = useState([]);
-  const [selectedScheduleKey, setSelectedScheduleKey] = useState(paramScheduleKey || 'nda');
+  const [selectedScheduleKey, setSelectedScheduleKey] = useState(paramScheduleKey || 'jlp_8_10');
   const [timetableSlots, setTimetableSlots] = useState([]);
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [categoryFilter, setCategoryFilter] = useState('all');
@@ -83,7 +83,14 @@ export default function AttendancePanel() {
 
   // Load schedules and subjects on mount
   useEffect(() => {
-    getSchedules().then(setSchedules).catch(() => {});
+    getSchedules()
+      .then((list) => {
+        setSchedules(list);
+        if (!paramScheduleKey && list.length > 0) {
+          setSelectedScheduleKey(list[0].key);
+        }
+      })
+      .catch(() => {});
     getSubjects()
       .then((data) => {
         const active = data.filter((subject) => subject.active !== false);
