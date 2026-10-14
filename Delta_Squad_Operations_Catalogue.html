@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Delta Squad Foundation - Platform Architecture & Service Catalogue</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap');
+
+    @page {
+      size: A4;
+      margin: 14mm 14mm 14mm 14mm;
+      @bottom-right {
+        content: counter(page);
+        font-size: 8pt;
+        color: #64748b;
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      color: #0f172a;
+      background: #ffffff;
+      line-height: 1.5;
+      font-size: 9.5pt;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    .page-break {
+      page-break-before: always;
+    }
+
+    /* HEADER */
+    .header-banner {
+      background: linear-gradient(135deg, #091e3a 0%, #0f2c59 100%);
+      color: white;
+      padding: 24px;
+      border-radius: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 12px rgba(9, 30, 58, 0.15);
+    }
+
+    .header-title h1 {
+      font-size: 20pt;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: #ffffff;
+      margin-bottom: 4px;
+    }
+
+    .header-title .tagline {
+      font-size: 10pt;
+      color: #93c5fd;
+      font-weight: 500;
+    }
+
+    .header-meta {
+      text-align: right;
+      font-size: 8.5pt;
+      color: #cbd5e1;
+    }
+
+    .badge-live {
+      display: inline-block;
+      background: #10b981;
+      color: #ffffff;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 9999px;
+      font-size: 7.5pt;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    /* SECTION TITLES */
+    h2.section-header {
+      font-size: 13pt;
+      font-weight: 800;
+      color: #0f2c59;
+      border-bottom: 2px solid #e2e8f0;
+      padding-bottom: 6px;
+      margin-top: 18px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    h3.sub-header {
+      font-size: 10.5pt;
+      font-weight: 700;
+      color: #1e293b;
+      margin-top: 12px;
+      margin-bottom: 6px;
+    }
+
+    /* ARCHITECTURE CALLOUT */
+    .arch-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .arch-card {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-left: 4px solid #2563eb;
+      padding: 10px 12px;
+      border-radius: 6px;
+    }
+
+    .arch-card h4 {
+      font-size: 9pt;
+      font-weight: 700;
+      color: #1e3a8a;
+      margin-bottom: 3px;
+    }
+
+    .arch-card p {
+      font-size: 8pt;
+      color: #475569;
+    }
+
+    /* MATRIX TABLE */
+    table.matrix-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 16px;
+      font-size: 8.5pt;
+    }
+
+    table.matrix-table th {
+      background: #0f2c59;
+      color: #ffffff;
+      padding: 7px 10px;
+      text-align: left;
+      font-weight: 600;
+    }
+
+    table.matrix-table td {
+      padding: 6px 10px;
+      border-bottom: 1px solid #e2e8f0;
+      color: #334155;
+    }
+
+    table.matrix-table tr:nth-child(even) td {
+      background: #f8fafc;
+    }
+
+    .pill-yes {
+      background: #dcfce7;
+      color: #15803d;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 7.5pt;
+    }
+
+    .pill-no {
+      background: #fee2e2;
+      color: #b91c1c;
+      font-weight: 600;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 7.5pt;
+    }
+
+    .pill-own {
+      background: #e0f2fe;
+      color: #0369a1;
+      font-weight: 600;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 7.5pt;
+    }
+
+    /* ROLE CARDS */
+    .role-block {
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 12px 14px;
+      margin-bottom: 14px;
+      background: #ffffff;
+    }
+
+    .role-block.commander {
+      border-top: 4px solid #b45309;
+    }
+
+    .role-block.admin {
+      border-top: 4px solid #1d4ed8;
+    }
+
+    .role-block.cadet {
+      border-top: 4px solid #059669;
+    }
+
+    .role-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .role-title {
+      font-size: 11pt;
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    .role-cred {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 8pt;
+      background: #f1f5f9;
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: #475569;
+      border: 1px solid #e2e8f0;
+    }
+
+    .feature-list {
+      list-style: none;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+
+    .feature-item {
+      background: #f8fafc;
+      border: 1px solid #f1f5f9;
+      padding: 6px 8px;
+      border-radius: 5px;
+    }
+
+    .feature-item strong {
+      display: block;
+      color: #1e293b;
+      font-size: 8.5pt;
+      margin-bottom: 1px;
+    }
+
+    .feature-item span {
+      font-size: 7.8pt;
+      color: #64748b;
+      line-height: 1.3;
+      display: block;
+    }
+
+    /* SCRIPT BOX */
+    .script-box {
+      background: #eff6ff;
+      border: 1px dashed #3b82f6;
+      border-radius: 6px;
+      padding: 10px 12px;
+      margin-top: 10px;
+      font-size: 8.5pt;
+      color: #1e40af;
+    }
+
+    .script-box strong {
+      display: block;
+      color: #1e3a8a;
+      margin-bottom: 3px;
+      font-size: 8.5pt;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* FOOTER */
+    .footer-note {
+      margin-top: 20px;
+      padding-top: 10px;
+      border-top: 1px solid #cbd5e1;
+      display: flex;
+      justify-content: space-between;
+      font-size: 7.5pt;
+      color: #94a3b8;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- PAGE 1 -->
+  <div class="header-banner">
+    <div class="header-title">
+      <h1>DELTA SQUAD FOUNDATION</h1>
+      <div class="tagline">Academy Operations Platform & Role Service Catalogue</div>
+    </div>
+    <div class="header-meta">
+      <div class="badge-live">● System Live & Operational</div>
+      <div><strong>Deployment:</strong> Netlify + Supabase DB</div>
+      <div><strong>Security:</strong> Server-Side RBAC & Signed URLs</div>
+      <div><strong>Date:</strong> October 2026 | Client Handover</div>
+    </div>
+  </div>
+
+  <div class="arch-grid">
+    <div class="arch-card">
+      <h4>🌐 Frontend Layer</h4>
+      <p>React 18 + Vite hosted on Netlify CDN with localized navigation, fast client routing, and responsive dashboard widgets.</p>
+    </div>
+    <div class="arch-card">
+      <h4>🔒 Security & API Engine</h4>
+      <p>Node/Express API with strict server-side RBAC, JWT tokens, bcrypt encryption, and complete SQL ownership verification.</p>
+    </div>
+    <div class="arch-card">
+      <h4>🗄️ Relational Data & Storage</h4>
+      <p>Supabase PostgreSQL with ACID relational foreign keys + Private Buckets for tamper-proof video drills & notes.</p>
+    </div>
+  </div>
+
+  <h2 class="section-header">1. Operational Roles & Service Capability Matrix</h2>
+  <table class="matrix-table">
+    <thead>
+      <tr>
+        <th style="width: 32%;">Module / Service</th>
+        <th style="width: 22%;">Training Commander</th>
+        <th style="width: 23%;">Admin Officer</th>
+        <th style="width: 23%;">Cadet (Trainee)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Admin Accounts Management</strong></td>
+        <td><span class="pill-yes">Full Control (Exclusive)</span></td>
+        <td><span class="pill-no">Access Restricted</span></td>
+        <td><span class="pill-no">Access Restricted</span></td>
+      </tr>
+      <tr>
+        <td><strong>Cadet Roster & Subject Assignments</strong></td>
+        <td><span class="pill-yes">Full Oversight</span></td>
+        <td><span class="pill-yes">Create / Edit / Assign</span></td>
+        <td><span class="pill-own">View Own Profile Only</span></td>
+      </tr>
+      <tr>
+        <td><strong>Daily Attendance Parade Runs</strong></td>
+        <td><span class="pill-yes">Oversight & Audit</span></td>
+        <td><span class="pill-yes">Mark / Correct Sessions</span></td>
+        <td><span class="pill-own">Personal % & History</span></td>
+      </tr>
+      <tr>
+        <td><strong>Academics, Tests & Grading</strong></td>
+        <td><span class="pill-yes">Oversight & Audit</span></td>
+        <td><span class="pill-yes">Create Tests / Enter Scores</span></td>
+        <td><span class="pill-own">Personal Scores Only</span></td>
+      </tr>
+      <tr>
+        <td><strong>Physical Drill Evidence (Video)</strong></td>
+        <td><span class="pill-yes">Review & Approve</span></td>
+        <td><span class="pill-yes">Review & Evaluate</span></td>
+        <td><span class="pill-own">Upload Video (50MB)</span></td>
+      </tr>
+      <tr>
+        <td><strong>Leave Requests Management</strong></td>
+        <td><span class="pill-yes">Approve / Reject</span></td>
+        <td><span class="pill-yes">Approve / Reject</span></td>
+        <td><span class="pill-own">Apply & Track Status</span></td>
+      </tr>
+      <tr>
+        <td><strong>Notice Board & Course Notes</strong></td>
+        <td><span class="pill-yes">Publish & Upload</span></td>
+        <td><span class="pill-yes">Publish & Upload</span></td>
+        <td><span class="pill-own">View & Download</span></td>
+      </tr>
+      <tr>
+        <td><strong>Institutional Audit Logs</strong></td>
+        <td><span class="pill-yes">Full History Ledger</span></td>
+        <td><span class="pill-yes">Activity Viewer</span></td>
+        <td><span class="pill-no">Access Restricted</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2 class="section-header">2. Public Portal & Admissions Inquiries</h2>
+  <div class="role-block" style="border-top: 4px solid #64748b;">
+    <div class="role-header">
+      <div class="role-title">Public Admissions & Academy Showcase (deltasquads.netlify.app)</div>
+      <div class="role-cred">Access: Public / Open</div>
+    </div>
+    <ul class="feature-list">
+      <li class="feature-item">
+        <strong>Cinematic Video Header</strong>
+        <span>Showcases academy spirit with "Train Hard. Lead Stronger" motto and dynamic video background.</span>
+      </li>
+      <li class="feature-item">
+        <strong>Foundation Gallery & Posters</strong>
+        <span>Presents Lt. Esan's leadership activities and 100% Scholarship program criteria.</span>
+      </li>
+      <li class="feature-item">
+        <strong>Live Counselling Registration Form</strong>
+        <span>Captures incoming candidates for JLP, SLP, YLP, and SSLP courses directly into PostgreSQL.</span>
+      </li>
+      <li class="feature-item">
+        <strong>Instant Lead Storage</strong>
+        <span>Form data triggers backend validation, storing contact details for administrative admissions follow-up.</span>
+      </li>
+    </ul>
+  </div>
+
+  <!-- PAGE BREAK FOR CLEAN PRINTING -->
+  <div class="page-break"></div>
+
+  <!-- PAGE 2 -->
+  <h2 class="section-header">3. Detailed Service Breakdown by Operational Role</h2>
+
+  <!-- COMMANDER -->
+  <div class="role-block commander">
+    <div class="role-header">
+      <div class="role-title">🎖️ Training Commander Portal — Supreme Governance</div>
+      <div class="role-cred">URL: /commander | Login: commander@commander.com</div>
+    </div>
+    <ul class="feature-list">
+      <li class="feature-item">
+        <strong>Live KPI Command Dashboard</strong>
+        <span>Real-time aggregate counters for Active Cadets (6), Operational Admins (1), Academy Attendance (84.6%), and Pending Drills.</span>
+      </li>
+      <li class="feature-item">
+        <strong>Automated Anomaly & Alert Engine</strong>
+        <span>Instantly flags red lines: low-attendance cadets (&lt; 75%) and pending unreviewed physical drill submissions.</span>
+      </li>
+      <li class="feature-item">
+        <strong>Admin Accounts Management (/admins)</strong>
+        <span>Exclusive executive privilege: create, inspect, deactivate, or delete operational Admin accounts.</span>
+      </li>
+      <li class="feature-item">
+        <strong>Institutional Audit Ledger (/audit-logs)</strong>
+        <span>Inspects unalterable record changes: actor, action, timestamp, target entity, and previous vs. new values.</span>
+      </li>
+      <li class="feature-item">
+        <strong>Academy Performance Reports (/reports)</strong>
+        <span>Aggregate reporting across batches, subject performance trends, and individual cadet history profiles.</span>
+      </li>
+      <li class="feature-item">
+        <strong>High-Level Oversight of Drills & Leaves</strong>
+        <span>Ability to inspect all pending leaves and physical drill submissions alongside administrative officers.</span>
+      </li>
+    </ul>
+    <div class="script-box">
+      <strong>Meeting Speaking Script for Commander Demo:</strong>
+      "When we log in as the Commander, we have top-tier oversight. The dashboard automatically calculates academy-wide attendance and flags any cadet slipping below benchmarks. Notice the Admin Accounts panel: only the Commander can provision or remove staff. Every single grade update, attendance change, or decision is archived in the tamper-proof Audit Log."
+    </div>
+  </div>
+
+  <!-- ADMIN -->
+  <div class="role-block admin">
+    <div class="role-header">
+      <div class="role-title">📋 Admin Officer Portal — Daily Academy Operations</div>
+      <div class="role-cred">URL: /admin | Login: admin@admin.com</div>
+    </div>
+    <ul class="feature-list">
+      <li class="feature-item">
+        <strong>Cadet Roster & Enrollment Management</strong>
+        <span>Create, update, and manage cadets with roll numbers, assigned squads/batches, and subject curriculum checklists.</span>
+      </li>
+      <li class="feature-item">
+        <strong>Daily Parade Attendance Engine (/attendance)</strong>
+        <span>Session-based muster. One-click 'Mark All Present/Absent', historical session reopening, and audited record correction.</span>
+      </li>
+      <li class="feature-item">
+        <strong>Academics, Marks & Exam Results (/academics)</strong>
+        <span>Set up assessments (Written, SSB, GTO, Psych) with maximum scores. Enter marks with strict boundary validation.</span>
+      </li>
+      <li class="feature-item">
+        <strong>Physical Video Verification Desk (/physical)</strong>
+        <span>Stream cadet-submitted workout videos via short-lived 5-min signed URLs. Enter instructor critiques and click Accept/Reject.</span>
+      </li>
+      <li class="feature-item">
+        <strong>Cadet Leave Desk (/leaves)</strong>
+        <span>Review cadet applications (medical, emergency). Approve or deny with recorded administrative justification remarks.</span>
+      </li>
+      <li class="feature-item">
+        <strong>Notice Board & Training Materials (/notices, /notes)</strong>
+        <span>Broadcast urgent alerts (triggers in-app notifications) and upload secure training compendiums to Supabase storage.</span>
+      </li>
+    </ul>
+    <div class="script-box">
+      <strong>Meeting Speaking Script for Admin Demo:</strong>
+      "The Admin portal is built for operational speed. During morning muster, the officer selects the subject and can mark the entire batch present in one click. In Physical Verification, videos submitted by cadets are streamed securely via temporary signed tokens—the officer adds critique remarks and approves the drill."
+    </div>
+  </div>
+
+  <!-- CADET -->
+  <div class="role-block cadet">
+    <div class="role-header">
+      <div class="role-title">🎯 Cadet (Trainee) Portal — Self-Service & Evidence</div>
+      <div class="role-cred">URL: /cadet | Login: cadet@cadet.com</div>
+    </div>
+    <ul class="feature-list">
+      <li class="feature-item">
+        <strong>Personal Performance Dashboard</strong>
+        <span>Interactive percentage rings showing overall attendance (e.g. 90%), sessions attended, academic GPA, and drills passed.</span>
+      </li>
+      <li class="feature-item">
+        <strong>Granular Subject-Wise Attendance</strong>
+        <span>Individual attendance breakdown for enrolled subjects (Physics, Mathematics, SSB Prep, General Studies).</span>
+      </li>
+      <li class="feature-item">
+        <strong>Physical Training Video Uploader (/physical)</strong>
+        <span>Select activity, date, and upload MP4/WebM video proof (up to 50MB) with an interactive percentage progress bar.</span>
+      </li>
+      <li class="feature-item">
+        <strong>Official Transcripts & Exam Results (/results)</strong>
+        <span>Securely view published exam rankings, psychological dossier evaluations, and GTO performance cards.</span>
+      </li>
+      <li class="feature-item">
+        <strong>Digital Leave Applications (/leaves)</strong>
+        <span>Submit leave duration and grounds. Monitor administrative decision and remarks in real time.</span>
+      </li>
+      <li class="feature-item">
+        <strong>Study Compendiums & Urgent Notices</strong>
+        <span>Download official notes uploaded by instructors and receive instant alerts on training schedule changes.</span>
+      </li>
+    </ul>
+    <div class="script-box">
+      <strong>Meeting Speaking Script for Cadet Demo:</strong>
+      "On the Cadet side, data privacy is absolute: trainees only see their own attendance rings, scores, and leaves. Cadets upload their physical exercise videos directly through the portal with a live progress bar, giving the academy verifiable digital proof of training."
+    </div>
+  </div>
+
+  <div class="footer-note">
+    <span>Delta Squad Foundation Operations Portal — Developed by Ideaseternal</span>
+    <span>CONFIDENTIAL & PROPRIETARY — FOR CLIENT REVIEW ONLY</span>
+  </div>
+
+</body>
+</html>

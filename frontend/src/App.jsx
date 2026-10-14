@@ -22,6 +22,7 @@ import Subjects from './pages/Subjects';
 import PhysicalTraining from './pages/PhysicalTraining';
 import CadetProfile from './pages/CadetProfile';
 import LegacyAttendance from './pages/LegacyAttendance';
+import Timetable from './pages/Timetable';
 import Layout from './components/Layout';
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
@@ -63,6 +64,7 @@ function App() {
               <CadetDashboard />
             </ProtectedRoute>
           } />
+          <Route path="/timetable" element={<ProtectedRoute allowedRoles={['admin', 'commander', 'cadet']}><Timetable /></ProtectedRoute>} />
           <Route path="/attendance" element={<ProtectedRoute allowedRoles={['admin', 'commander', 'cadet']}><Attendance /></ProtectedRoute>} />
           <Route path="/academics" element={<ProtectedRoute allowedRoles={['admin', 'commander', 'cadet']}><Academics /></ProtectedRoute>} />
           <Route path="/subjects" element={<ProtectedRoute allowedRoles={['admin', 'commander']}><Subjects /></ProtectedRoute>} />

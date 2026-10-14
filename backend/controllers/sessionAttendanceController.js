@@ -18,17 +18,40 @@ const createSession = async (req, res) => {
 
 const getEligibleCadets = async (req, res) => {
   try {
-    const { subjectId, batch } = req.query;
+    const { subjectId, batch, date } = req.query;
     if (!subjectId) return res.status(400).json({ message: 'subjectId is required' });
-    const values = [subjectId];
+    const sessionDate = date || new Date().toISOString().slice(0, 10);
+    const values = [subjectId, sessionDate];
     let batchFilter = '';
-    if (batch) { values.push(batch); batchFilter = ` AND COALESCE(a.batch,p.batch)=$${values.length}`; }
-    const result = await pool.query(`SELECT u.id,u.name,u.email,p.roll_no,p.batch,p.programme
-      FROM subject_assignments a JOIN users u ON u.id=a.cadet_id
-      LEFT JOIN cadet_profiles p ON p.user_id=u.id
-      WHERE a.subject_id=$1 AND u.role='cadet' AND COALESCE(p.status,'active')='active'${batchFilter}
-      ORDER BY u.name`, values);
-    res.json(result.rows.map((row) => ({ ...row, _id: row.id })));
+    if (batch) {
+      values.push(batch);
+      batchFilter = ` AND (a.batch = $${values.length} OR p.batch = $${values.length} OR p.programme = $${values.length})`;
+    }
+    const result = await pool.query(`
+      SELECT DISTINCT ON (u.id) u.id, u.name, u.email, p.roll_no, p.batch, p.programme,
+        l.id AS active_leave_id, l.reason AS leave_reason, l.start_date AS leave_start_date, l.end_date AS leave_end_date,
+        l.reviewer_remarks AS leave_remarks
+      FROM users u
+      LEFT JOIN cadet_profiles p ON p.user_id = u.id
+      LEFT JOIN subject_assignments a ON a.cadet_id = u.id AND a.subject_id = $1
+      LEFT JOIN leaves l ON l.cadet_id = u.id AND l.status = 'approved' AND $2::date BETWEEN l.start_date::date AND l.end_date::date
+      WHERE u.role = 'cadet' AND COALESCE(p.status, 'active') = 'active'${batchFilter}
+      ORDER BY u.id, l.id DESC
+    `, values);
+    
+    const uniqueCadets = result.rows.sort((a, b) => a.name.localeCompare(b.name));
+    res.json(uniqueCadets.map((row) => ({
+      ...row,
+      _id: row.id,
+      is_on_leave: Boolean(row.active_leave_id),
+      active_leave: row.active_leave_id ? {
+        id: row.active_leave_id,
+        reason: row.leave_reason,
+        start_date: row.leave_start_date,
+        end_date: row.leave_end_date,
+        remarks: row.leave_remarks
+      } : null
+    })));
   } catch (error) { res.status(500).json({ message: error.message }); }
 };
 
@@ -48,13 +71,19 @@ const getSessions = async (req, res) => {
 const getSessionRecords = async (req, res) => {
   try {
     const result = await pool.query(`SELECT r.id,r.session_id,r.cadet_id,r.status,r.marked_at,r.updated_at,
-      u.name,u.email,p.roll_no,p.batch
+      u.name,u.email,p.roll_no,p.batch,
+      l.id AS active_leave_id, l.reason AS leave_reason
       FROM attendance_session_records r
       JOIN users u ON u.id=r.cadet_id
       LEFT JOIN cadet_profiles p ON p.user_id=u.id
+      JOIN attendance_sessions s ON s.id=r.session_id
+      LEFT JOIN leaves l ON l.cadet_id=u.id AND l.status='approved' AND s.session_date BETWEEN l.start_date::date AND l.end_date::date
       WHERE r.session_id=$1
       ORDER BY u.name`, [req.params.sessionId]);
-    res.json(result.rows);
+    res.json(result.rows.map(r => ({
+      ...r,
+      is_on_leave: r.status === 'leave' || Boolean(r.active_leave_id)
+    })));
   } catch (error) { res.status(500).json({ message: error.message }); }
 };
 
@@ -64,18 +93,18 @@ const bulkRecords = async (req, res) => {
     const { sessionId, records } = req.body;
     if (!sessionId || !Array.isArray(records) || records.length === 0) return res.status(400).json({ message: 'Session and records are required' });
     const normalizedRecords = records.map((record) => ({ cadetId: Number(record.cadetId), status: record.status }));
-    if (normalizedRecords.some((record) => !Number.isInteger(record.cadetId) || !['present', 'absent'].includes(record.status))) return res.status(400).json({ message: 'Each record needs a cadet and valid status' });
+    if (normalizedRecords.some((record) => !Number.isInteger(record.cadetId) || !['present', 'absent', 'leave'].includes(record.status))) return res.status(400).json({ message: 'Each record needs a cadet and valid status (present, absent, or leave)' });
     const cadetIds = normalizedRecords.map((record) => record.cadetId);
     if (new Set(cadetIds).size !== cadetIds.length) return res.status(400).json({ message: 'Each cadet can appear only once in an attendance save' });
     await client.query('BEGIN');
     const session = await client.query('SELECT id,subject_id,batch FROM attendance_sessions WHERE id=$1', [sessionId]);
     if (!session.rows.length) { await client.query('ROLLBACK'); return res.status(404).json({ message: 'Session not found' }); }
     const eligible = await client.query(`SELECT u.id FROM users u
-      JOIN subject_assignments a ON a.cadet_id=u.id AND a.subject_id=$2
+      LEFT JOIN subject_assignments a ON a.cadet_id=u.id AND a.subject_id=$2
       LEFT JOIN cadet_profiles p ON p.user_id=u.id
       WHERE u.id = ANY($1::int[]) AND u.role='cadet' AND COALESCE(p.status,'active')='active'
-      AND ($3::text IS NULL OR a.batch IS NULL OR a.batch=$3)`, [cadetIds, session.rows[0].subject_id, session.rows[0].batch]);
-    if (eligible.rows.length !== cadetIds.length) { await client.query('ROLLBACK'); return res.status(400).json({ message: 'Cadets can be marked only when active and assigned to this subject and batch' }); }
+      AND ($3::text IS NULL OR a.batch IS NULL OR a.batch=$3 OR p.batch=$3 OR p.programme=$3)`, [cadetIds, session.rows[0].subject_id, session.rows[0].batch]);
+    if (eligible.rows.length !== cadetIds.length) { await client.query('ROLLBACK'); return res.status(400).json({ message: 'Cadets can be marked only when active and assigned to this program' }); }
     const existing = await client.query('SELECT * FROM attendance_session_records WHERE session_id=$1 AND cadet_id = ANY($2::int[])', [sessionId, cadetIds]);
     const existingByCadet = new Map(existing.rows.map((record) => [record.cadet_id, record]));
     const values = []; const parameters = [];
@@ -99,7 +128,7 @@ const bulkRecords = async (req, res) => {
 const updateRecord = async (req, res) => {
   try {
     const { status } = req.body;
-    if (!['present', 'absent'].includes(status)) return res.status(400).json({ message: 'Status must be present or absent' });
+    if (!['present', 'absent', 'leave'].includes(status)) return res.status(400).json({ message: 'Status must be present, absent, or leave' });
     const before = await pool.query('SELECT * FROM attendance_session_records WHERE id=$1', [req.params.id]);
     if (!before.rows.length) return res.status(404).json({ message: 'Attendance record not found' });
     const result = await pool.query('UPDATE attendance_session_records SET status=$1,updated_by=$2,updated_at=CURRENT_TIMESTAMP WHERE id=$3 RETURNING *', [status, req.user.id, req.params.id]);
@@ -112,17 +141,40 @@ const getMyAttendance = async (req, res) => {
   try {
     const cadetId = req.user.role === 'cadet' ? req.user.id : req.params.cadetId;
     if (!cadetId) return res.status(400).json({ message: 'Cadet is required' });
-    const [history, summary] = await Promise.all([pool.query('SELECT r.*, a.session_date, a.start_time, a.end_time, a.session_type, a.batch, s.id AS subject_id, s.name AS subject_name FROM attendance_session_records r JOIN attendance_sessions a ON a.id=r.session_id JOIN subjects s ON s.id=a.subject_id WHERE r.cadet_id=$1 ORDER BY a.session_date DESC,a.start_time DESC NULLS LAST', [cadetId]), pool.query(`SELECT s.id AS subject_id,s.name AS subject_name,s.category,
-      COUNT(r.id)::int AS total_sessions,
-      COUNT(*) FILTER (WHERE r.status='present')::int AS present_count,
-      COUNT(*) FILTER (WHERE r.status='absent')::int AS absent_count,
-      COALESCE(ROUND(100.0*COUNT(*) FILTER (WHERE r.status='present')/NULLIF(COUNT(r.id),0),1),0) AS percentage
-      FROM subject_assignments sa JOIN subjects s ON s.id=sa.subject_id
-      LEFT JOIN attendance_sessions a ON a.subject_id=s.id AND (sa.batch IS NULL OR a.batch IS NULL OR a.batch=sa.batch)
-      LEFT JOIN attendance_session_records r ON r.session_id=a.id AND r.cadet_id=sa.cadet_id
-      WHERE sa.cadet_id=$1 GROUP BY s.id,s.name,s.category ORDER BY s.name`, [cadetId])]);
+    const [history, summary] = await Promise.all([
+      pool.query(`
+        SELECT r.*, a.session_date, a.start_time, a.end_time, a.session_type, a.batch, 
+          s.id AS subject_id, s.name AS subject_name,
+          l.reason AS leave_reason
+        FROM attendance_session_records r 
+        JOIN attendance_sessions a ON a.id=r.session_id 
+        JOIN subjects s ON s.id=a.subject_id 
+        LEFT JOIN leaves l ON l.cadet_id=r.cadet_id AND l.status='approved' AND a.session_date BETWEEN l.start_date::date AND l.end_date::date
+        WHERE r.cadet_id=$1 
+        ORDER BY a.session_date DESC, a.start_time DESC NULLS LAST
+      `, [cadetId]),
+      pool.query(`
+        SELECT s.id AS subject_id, s.name AS subject_name, s.category,
+          COUNT(r.id)::int AS total_sessions,
+          COUNT(*) FILTER (WHERE r.status='present')::int AS present_count,
+          COUNT(*) FILTER (WHERE r.status='absent')::int AS absent_count,
+          COUNT(*) FILTER (WHERE r.status='leave')::int AS leave_count,
+          COALESCE(
+            ROUND(100.0 * COUNT(*) FILTER (WHERE r.status='present') / NULLIF(COUNT(r.id) - COUNT(*) FILTER (WHERE r.status='leave'), 0), 1),
+            COALESCE(ROUND(100.0 * COUNT(*) FILTER (WHERE r.status='present') / NULLIF(COUNT(r.id), 0), 1), 0)
+          ) AS percentage
+        FROM subject_assignments sa 
+        JOIN subjects s ON s.id=sa.subject_id
+        LEFT JOIN attendance_sessions a ON a.subject_id=s.id AND (sa.batch IS NULL OR a.batch IS NULL OR a.batch=sa.batch)
+        LEFT JOIN attendance_session_records r ON r.session_id=a.id AND r.cadet_id=sa.cadet_id
+        WHERE sa.cadet_id=$1 
+        GROUP BY s.id, s.name, s.category 
+        ORDER BY s.name
+      `, [cadetId])
+    ]);
     res.json({ summary: summary.rows, history: history.rows });
   } catch (error) { res.status(500).json({ message: error.message }); }
 };
 
 module.exports = { createSession, getSessions, getSessionRecords, getEligibleCadets, bulkRecords, updateRecord, getMyAttendance };
+

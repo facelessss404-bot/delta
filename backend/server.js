@@ -91,6 +91,7 @@ app.use('/api/reports', require('./routes/reportRoutes'));
 app.use('/api/audit-logs', require('./routes/auditRoutes'));
 app.use('/api/settings', require('./routes/settings'));
 app.use('/api/notifications', require('./routes/notifications'));
+app.use('/api/timetable', require('./routes/timetableRoutes'));
 
 // ---------- Static frontend serving (production) ----------
 const fs = require('fs');

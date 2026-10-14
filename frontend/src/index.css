@@ -640,18 +640,33 @@ h1.text-3xl { letter-spacing: -0.025em; }
     -webkit-backdrop-filter: blur(3px);
   }
 
-  .glass-panel { border-radius: 18px !important; }
+  /* High-performance mobile scrolling: disable multi-pass blur and fixed ambient orbs */
+  body::before,
+  body::after {
+    display: none !important;
+  }
+
+  .glass-panel {
+    border-radius: 18px !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: #0F2119 !important;
+  }
   .glass-panel.rounded-3xl { border-radius: 18px !important; }
   .app-main .grid { gap: 12px; }
 
   /* Stack heading actions on mobile */
   .flex.flex-wrap.items-start.justify-between { flex-direction: column; }
 
-  /* Public hero */
-  .public-hero { height: min(100svh, 780px) !important; }
+  /* Public hero mobile optimizations */
+  .hero-video { display: none !important; }
+  .public-hero {
+    height: min(100svh, 780px) !important;
+    background: radial-gradient(circle at 50% 30%, #17382a 0%, #0B1A13 85%) !important;
+  }
   .public-hero h1 { font-size: clamp(2.8rem, 14vw, 4.2rem) !important; }
   .public-hero p { font-size: 1rem !important; line-height: 1.55 !important; }
-  .login-panel { padding: 28px 20px !important; border-radius: 20px !important; }
+  .login-panel { padding: 28px 20px !important; border-radius: 20px !important; max-width: 100% !important; }
 }
 
 @media (max-width: 480px) {

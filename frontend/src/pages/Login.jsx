@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react';
 import { motion, useScroll, useTransform, useInView } from 'framer-motion';
-import { ChevronDown, GraduationCap, BookOpen, Award, Shield, MapPin, Building, Phone, Facebook, Youtube, Mail, Lock, Loader2 } from 'lucide-react';
+import { ChevronDown, GraduationCap, BookOpen, Award, Shield, MapPin, Building, Phone, Facebook, Youtube, Mail, Lock, Loader2, User, UserPlus, LogIn as LogInIcon, CheckCircle2, ArrowRight } from 'lucide-react';
 import { AuthContext } from '../context/AuthContext';
 import api from '../services/api';
 import { useNavigate } from 'react-router-dom';
@@ -93,10 +93,31 @@ const ActivityCard = ({ icon: Icon, title, desc, index }) => (
   </motion.div>
 );
 
+const CADET_CATEGORIES = [
+  { id: 'JLP', badge: 'JLB / JLP', name: 'Junior Leadership', sub: 'Grades 8–10 Foundation', icon: GraduationCap },
+  { id: 'SLP', badge: 'SLB / SLP', name: 'Senior Leadership', sub: 'Grades 11–12 Senior', icon: BookOpen },
+  { id: 'YLP', badge: 'YLB / YLP', name: 'Youth Leadership', sub: 'NDA & Civil Prep', icon: Shield },
+  { id: 'SSLP', badge: 'SSLB / SSLP', name: 'Special SSB', sub: 'Officer Academy', icon: Award },
+];
+
 /* ─── Main Component ─── */
 const Login = () => {
+  const [authMode, setAuthMode] = useState('signin'); // 'signin' | 'signup'
+  const [activeRoleTab, setActiveRoleTab] = useState('cadet'); // 'cadet' | 'commander' | 'admin'
+  const [cadetCategory, setCadetCategory] = useState('JLP');
+
+  // Sign in fields
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+
+  // Sign up fields
+  const [signupName, setSignupName] = useState('');
+  const [signupEmail, setSignupEmail] = useState('');
+  const [signupPassword, setSignupPassword] = useState('');
+  const [signupPhone, setSignupPhone] = useState('');
+  const [signupRollNo, setSignupRollNo] = useState('');
+  const [signupSuccess, setSignupSuccess] = useState('');
+
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
@@ -105,12 +126,17 @@ const Login = () => {
   const { scrollY } = useScroll();
   const yCollage = useTransform(scrollY, [0, 1000], [0, 80]);
 
-  const handleSubmit = async (e) => {
+  const handleSignIn = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     setError('');
     try {
-      const { data } = await api.post('/auth/login', { email, password });
+      const payload = {
+        email: email.trim(),
+        password,
+        category: activeRoleTab === 'cadet' ? cadetCategory : undefined
+      };
+      const { data } = await api.post('/auth/login', payload);
       login(data);
       if (data.role === 'admin') navigate('/admin');
       else if (data.role === 'commander') navigate('/commander');
@@ -121,14 +147,41 @@ const Login = () => {
     }
   };
 
+  const handleSignUp = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError('');
+    setSignupSuccess('');
+    try {
+      const payload = {
+        name: signupName.trim(),
+        email: signupEmail.trim(),
+        password: signupPassword,
+        category: cadetCategory,
+        phone: signupPhone.trim(),
+        rollNo: signupRollNo.trim() || undefined,
+        batch: '2025-2026'
+      };
+      const { data } = await api.post('/auth/cadet-signup', payload);
+      setSignupSuccess(`Welcome Cadet ${data.name}! Enrolled into ${cadetCategory} division. Entering portal...`);
+      setTimeout(() => {
+        login(data);
+        navigate('/cadet');
+      }, 700);
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to enroll cadet account');
+      setIsLoading(false);
+    }
+  };
+
   const inputStyle = {
     width: '100%',
     background: '#0B1A13',
     border: '1px solid rgba(255,255,255,0.1)',
     borderRadius: 8,
-    padding: '14px 16px 14px 44px',
+    padding: '13px 16px 13px 44px',
     color: '#F5F5F0',
-    fontSize: 15,
+    fontSize: 14,
     outline: 'none',
     transition: 'border-color 200ms ease',
     boxSizing: 'border-box',
@@ -142,6 +195,7 @@ const Login = () => {
           ════════════════════════════════════════════════════════ */}
       <section className="public-hero" style={{ position: 'relative', width: '100%', height: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
         <video
+          className="hero-video"
           src="/logo_animation.mp4"
           autoPlay muted playsInline loop
           style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
@@ -374,124 +428,376 @@ const Login = () => {
       <RegistrationSection />
 
       {/* ════════════════════════════════════════════════════════
-          SECTION 4 — LOGIN
+          SECTION 4 — AUTHENTICATION (SIGN IN / CADET SIGN UP)
           ════════════════════════════════════════════════════════ */}
-      <section id="login" style={{ padding: '80px 24px', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '70vh' }}>
+      <section id="login" style={{ padding: '80px 24px', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '75vh' }}>
         <motion.div
           initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-40px' }}
           variants={reveal} transition={revealTransition}
           className="login-panel"
-          style={{ width: '100%', maxWidth: 400, background: '#0F2119', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 16, padding: '40px 32px' }}
+          style={{ width: '100%', maxWidth: 460, background: '#0F2119', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 20, padding: '36px 28px', boxShadow: '0 20px 50px rgba(0,0,0,0.5)' }}
         >
-          <div style={{ textAlign: 'center', marginBottom: 32 }}>
-            <h2 style={{ fontSize: 20, fontWeight: 700, letterSpacing: '-0.01em', marginBottom: 8 }}>
-              Personnel Login
+          {/* Mode Switcher Tabs */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6, background: 'rgba(0,0,0,0.35)', padding: 4, borderRadius: 12, marginBottom: 24, border: '1px solid rgba(255,255,255,0.06)' }}>
+            <button
+              type="button"
+              data-testid="tab-signin"
+              onClick={() => { setAuthMode('signin'); setError(''); setSignupSuccess(''); }}
+              style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                padding: '10px 14px', borderRadius: 9, border: 'none', cursor: 'pointer',
+                fontSize: 13, fontWeight: 700, transition: 'all 180ms ease',
+                background: authMode === 'signin' ? '#C9A84C' : 'transparent',
+                color: authMode === 'signin' ? '#0B1A13' : 'rgba(245,245,240,0.6)',
+              }}
+            >
+              <LogInIcon size={15} />
+              Personnel Sign In
+            </button>
+            <button
+              type="button"
+              data-testid="tab-signup"
+              onClick={() => { setAuthMode('signup'); setActiveRoleTab('cadet'); setError(''); setSignupSuccess(''); }}
+              style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                padding: '10px 14px', borderRadius: 9, border: 'none', cursor: 'pointer',
+                fontSize: 13, fontWeight: 700, transition: 'all 180ms ease',
+                background: authMode === 'signup' ? '#C9A84C' : 'transparent',
+                color: authMode === 'signup' ? '#0B1A13' : 'rgba(245,245,240,0.6)',
+              }}
+            >
+              <UserPlus size={15} />
+              Cadet Sign Up
+            </button>
+          </div>
+
+          {/* Header */}
+          <div style={{ textAlign: 'center', marginBottom: 24 }}>
+            <h2 style={{ fontSize: 22, fontWeight: 800, letterSpacing: '-0.02em', marginBottom: 6, color: '#F5F5F0' }}>
+              {authMode === 'signin' ? 'Command & Cadet Access' : 'Cadet Self-Registration'}
             </h2>
-            <p style={{ fontSize: 14, color: 'rgba(245,245,240,0.4)', margin: 0 }}>
-              Access your Delta Squad console
+            <p style={{ fontSize: 13, color: 'rgba(245,245,240,0.5)', margin: 0 }}>
+              {authMode === 'signin'
+                ? 'Sign in to access your division timetable, logs, and portal'
+                : 'Enrol yourself directly to avoid manual administrative entry'}
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-            {/* Quick Demo Logins for tomorrow's handover presentation */}
-            <div style={{ marginBottom: 4 }}>
-              <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgba(201,168,76,0.85)', marginBottom: 8, textAlign: 'center' }}>
-                Quick Demo Access (1-Click)
+          {/* Feedback Banners */}
+          {error && (
+            <div data-testid="login-error" style={{ background: 'rgba(248,113,113,0.1)', border: '1px solid rgba(248,113,113,0.25)', color: '#FCA5A5', padding: '10px 14px', borderRadius: 8, fontSize: 13, textAlign: 'center', fontWeight: 500, marginBottom: 16 }}>
+              {error}
+            </div>
+          )}
+          {signupSuccess && (
+            <div style={{ background: 'rgba(52,211,153,0.1)', border: '1px solid rgba(52,211,153,0.3)', color: '#6EE7B7', padding: '10px 14px', borderRadius: 8, fontSize: 13, textAlign: 'center', fontWeight: 600, marginBottom: 16 }}>
+              {signupSuccess}
+            </div>
+          )}
+
+          {/* ══════════════════════════════════════
+              MODE 1: PERSONNEL SIGN IN
+              ══════════════════════════════════════ */}
+          {authMode === 'signin' && (
+            <form onSubmit={handleSignIn} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              {/* Quick Demo Logins */}
+              <div>
+                <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgba(201,168,76,0.85)', marginBottom: 8, textAlign: 'center' }}>
+                  Select Role / Quick Demo Access
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 6 }}>
+                  <button
+                    type="button"
+                    data-testid="demo-login-commander"
+                    onClick={() => {
+                      setEmail('commander@commander.com');
+                      setPassword('password123');
+                      setActiveRoleTab('commander');
+                      setError('');
+                    }}
+                    style={{
+                      padding: '8px 4px', fontSize: 11, fontWeight: 700, borderRadius: 8,
+                      border: activeRoleTab === 'commander' ? '1px solid #C9A84C' : '1px solid rgba(255,255,255,0.1)',
+                      background: activeRoleTab === 'commander' ? 'rgba(201,168,76,0.2)' : 'rgba(255,255,255,0.03)',
+                      color: activeRoleTab === 'commander' ? '#C9A84C' : 'rgba(245,245,240,0.7)',
+                      cursor: 'pointer', transition: 'all 150ms ease', textAlign: 'center'
+                    }}
+                  >
+                    🛡️ Commander
+                  </button>
+                  <button
+                    type="button"
+                    data-testid="demo-login-admin"
+                    onClick={() => {
+                      setEmail('admin@admin.com');
+                      setPassword('password123');
+                      setActiveRoleTab('admin');
+                      setError('');
+                    }}
+                    style={{
+                      padding: '8px 4px', fontSize: 11, fontWeight: 700, borderRadius: 8,
+                      border: activeRoleTab === 'admin' ? '1px solid #C9A84C' : '1px solid rgba(255,255,255,0.1)',
+                      background: activeRoleTab === 'admin' ? 'rgba(201,168,76,0.2)' : 'rgba(255,255,255,0.03)',
+                      color: activeRoleTab === 'admin' ? '#C9A84C' : 'rgba(245,245,240,0.7)',
+                      cursor: 'pointer', transition: 'all 150ms ease', textAlign: 'center'
+                    }}
+                  >
+                    📋 Admin
+                  </button>
+                  <button
+                    type="button"
+                    data-testid="demo-login-cadet"
+                    onClick={() => {
+                      setEmail('cadet@cadet.com');
+                      setPassword('password123');
+                      setActiveRoleTab('cadet');
+                      setError('');
+                    }}
+                    style={{
+                      padding: '8px 4px', fontSize: 11, fontWeight: 700, borderRadius: 8,
+                      border: activeRoleTab === 'cadet' ? '1px solid #C9A84C' : '1px solid rgba(255,255,255,0.1)',
+                      background: activeRoleTab === 'cadet' ? 'rgba(201,168,76,0.2)' : 'rgba(255,255,255,0.03)',
+                      color: activeRoleTab === 'cadet' ? '#C9A84C' : 'rgba(245,245,240,0.7)',
+                      cursor: 'pointer', transition: 'all 150ms ease', textAlign: 'center'
+                    }}
+                  >
+                    🎖️ Cadet
+                  </button>
+                </div>
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 6 }}>
+
+              {/* Cadet Category Selector (Prompted for cadets) */}
+              {activeRoleTab === 'cadet' && (
+                <div style={{ background: 'rgba(0,0,0,0.25)', padding: 12, borderRadius: 12, border: '1px solid rgba(201,168,76,0.2)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+                    <span style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#C9A84C' }}>
+                      Training Category (Mandatory for Cadets)
+                    </span>
+                    <span style={{ fontSize: 10, color: 'rgba(245,245,240,0.45)' }}>Select batch</span>
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8 }}>
+                    {CADET_CATEGORIES.map((cat) => {
+                      const isSelected = cadetCategory === cat.id;
+                      const Icon = cat.icon;
+                      return (
+                        <button
+                          key={cat.id}
+                          type="button"
+                          onClick={() => setCadetCategory(cat.id)}
+                          style={{
+                            display: 'flex', flexDirection: 'column', alignItems: 'flex-start',
+                            padding: '10px 12px', borderRadius: 8, textAlign: 'left',
+                            cursor: 'pointer', transition: 'all 150ms ease',
+                            background: isSelected ? 'rgba(201,168,76,0.18)' : 'rgba(255,255,255,0.03)',
+                            border: isSelected ? '1px solid #C9A84C' : '1px solid rgba(255,255,255,0.08)',
+                          }}
+                        >
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', marginBottom: 3 }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                              <Icon size={14} style={{ color: isSelected ? '#C9A84C' : 'rgba(245,245,240,0.6)' }} />
+                              <span style={{ fontSize: 12, fontWeight: 700, color: isSelected ? '#C9A84C' : '#F5F5F0' }}>
+                                {cat.badge}
+                              </span>
+                            </div>
+                            {isSelected && <CheckCircle2 size={13} style={{ color: '#C9A84C' }} />}
+                          </div>
+                          <span style={{ fontSize: 10, color: 'rgba(245,245,240,0.45)', lineHeight: 1.2 }}>
+                            {cat.sub}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              <div style={{ position: 'relative' }}>
+                <Mail size={16} style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', color: 'rgba(201,168,76,0.5)' }} />
+                <input
+                  data-testid="login-email" type="email" required placeholder="Email address"
+                  value={email} onChange={e => setEmail(e.target.value)}
+                  style={inputStyle}
+                  onFocus={e => e.target.style.borderColor = 'rgba(201,168,76,0.4)'}
+                  onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}
+                />
+              </div>
+
+              <div style={{ position: 'relative' }}>
+                <Lock size={16} style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', color: 'rgba(201,168,76,0.5)' }} />
+                <input
+                  data-testid="login-password" type="password" required placeholder="Password"
+                  value={password} onChange={e => setPassword(e.target.value)}
+                  style={inputStyle}
+                  onFocus={e => e.target.style.borderColor = 'rgba(201,168,76,0.4)'}
+                  onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}
+                />
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <button
                   type="button"
-                  data-testid="demo-login-commander"
-                  onClick={() => { setEmail('commander@commander.com'); setPassword('password123'); setError(''); }}
-                  style={{
-                    padding: '8px 4px', fontSize: 11, fontWeight: 700, borderRadius: 8,
-                    border: email === 'commander@commander.com' ? '1px solid #C9A84C' : '1px solid rgba(255,255,255,0.1)',
-                    background: email === 'commander@commander.com' ? 'rgba(201,168,76,0.2)' : 'rgba(255,255,255,0.03)',
-                    color: email === 'commander@commander.com' ? '#C9A84C' : 'rgba(245,245,240,0.7)',
-                    cursor: 'pointer', transition: 'all 150ms ease', textAlign: 'center'
-                  }}
+                  onClick={() => { setAuthMode('signup'); setActiveRoleTab('cadet'); }}
+                  style={{ background: 'none', border: 'none', color: '#C9A84C', fontSize: 12, cursor: 'pointer', padding: 0, textDecoration: 'underline' }}
                 >
-                  🛡️ Commander
+                  Need to self-register as a cadet?
                 </button>
+                <a href="/forgot-password" style={{ color: 'rgba(201,168,76,0.8)', fontSize: 12, textAlign: 'right', textDecoration: 'none' }}>
+                  Forgot password?
+                </a>
+              </div>
+
+              <button
+                data-testid="login-submit" type="submit" disabled={isLoading}
+                style={{
+                  width: '100%', padding: '14px', borderRadius: 8, border: 'none',
+                  background: '#C9A84C', color: '#0B1A13', fontWeight: 700, fontSize: 14,
+                  cursor: isLoading ? 'not-allowed' : 'pointer',
+                  opacity: isLoading ? 0.6 : 1,
+                  transition: 'filter 150ms ease, transform 100ms ease',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                  marginTop: 4,
+                }}
+                onMouseEnter={e => { if (!isLoading) e.currentTarget.style.filter = 'brightness(1.1)'; }}
+                onMouseLeave={e => { e.currentTarget.style.filter = 'brightness(1)'; }}
+              >
+                {isLoading ? ( <><Loader2 size={16} className="animate-spin" /> Authenticating...</> ) : 'Sign in to Console'}
+              </button>
+            </form>
+          )}
+
+          {/* ══════════════════════════════════════
+              MODE 2: CADET SELF-SIGNUP
+              ══════════════════════════════════════ */}
+          {authMode === 'signup' && (
+            <form onSubmit={handleSignUp} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+              {/* Category Selection */}
+              <div>
+                <label style={{ display: 'block', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#C9A84C', marginBottom: 6 }}>
+                  Select Training Category *
+                </label>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8 }}>
+                  {CADET_CATEGORIES.map((cat) => {
+                    const isSelected = cadetCategory === cat.id;
+                    const Icon = cat.icon;
+                    return (
+                      <button
+                        key={cat.id}
+                        type="button"
+                        onClick={() => setCadetCategory(cat.id)}
+                        style={{
+                          display: 'flex', flexDirection: 'column', alignItems: 'flex-start',
+                          padding: '10px 12px', borderRadius: 8, textAlign: 'left',
+                          cursor: 'pointer', transition: 'all 150ms ease',
+                          background: isSelected ? 'rgba(201,168,76,0.18)' : 'rgba(255,255,255,0.03)',
+                          border: isSelected ? '1px solid #C9A84C' : '1px solid rgba(255,255,255,0.08)',
+                        }}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', marginBottom: 3 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                            <Icon size={14} style={{ color: isSelected ? '#C9A84C' : 'rgba(245,245,240,0.6)' }} />
+                            <span style={{ fontSize: 12, fontWeight: 700, color: isSelected ? '#C9A84C' : '#F5F5F0' }}>
+                              {cat.badge}
+                            </span>
+                          </div>
+                          {isSelected && <CheckCircle2 size={13} style={{ color: '#C9A84C' }} />}
+                        </div>
+                        <span style={{ fontSize: 10, color: 'rgba(245,245,240,0.45)', lineHeight: 1.2 }}>
+                          {cat.sub}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Full Name */}
+              <div style={{ position: 'relative' }}>
+                <User size={16} style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', color: 'rgba(201,168,76,0.5)' }} />
+                <input
+                  type="text" required placeholder="Cadet Full Name *"
+                  value={signupName} onChange={e => setSignupName(e.target.value)}
+                  style={inputStyle}
+                  onFocus={e => e.target.style.borderColor = 'rgba(201,168,76,0.4)'}
+                  onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}
+                />
+              </div>
+
+              {/* Email */}
+              <div style={{ position: 'relative' }}>
+                <Mail size={16} style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', color: 'rgba(201,168,76,0.5)' }} />
+                <input
+                  type="email" required placeholder="Cadet Email Address *"
+                  value={signupEmail} onChange={e => setSignupEmail(e.target.value)}
+                  style={inputStyle}
+                  onFocus={e => e.target.style.borderColor = 'rgba(201,168,76,0.4)'}
+                  onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}
+                />
+              </div>
+
+              {/* Password */}
+              <div style={{ position: 'relative' }}>
+                <Lock size={16} style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', color: 'rgba(201,168,76,0.5)' }} />
+                <input
+                  type="password" required minLength={8} placeholder="Password (minimum 8 characters) *"
+                  value={signupPassword} onChange={e => setSignupPassword(e.target.value)}
+                  style={inputStyle}
+                  onFocus={e => e.target.style.borderColor = 'rgba(201,168,76,0.4)'}
+                  onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}
+                />
+              </div>
+
+              {/* Phone */}
+              <div style={{ position: 'relative' }}>
+                <Phone size={16} style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', color: 'rgba(201,168,76,0.5)' }} />
+                <input
+                  type="tel" placeholder="Mobile / WhatsApp Number (Optional)"
+                  value={signupPhone} onChange={e => setSignupPhone(e.target.value)}
+                  style={inputStyle}
+                  onFocus={e => e.target.style.borderColor = 'rgba(201,168,76,0.4)'}
+                  onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}
+                />
+              </div>
+
+              {/* Roll Number (Optional) */}
+              <div style={{ position: 'relative' }}>
+                <Award size={16} style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', color: 'rgba(201,168,76,0.5)' }} />
+                <input
+                  type="text" placeholder={`Roll No (leave blank to auto-generate: DS-${cadetCategory}-XXXX)`}
+                  value={signupRollNo} onChange={e => setSignupRollNo(e.target.value)}
+                  style={inputStyle}
+                  onFocus={e => e.target.style.borderColor = 'rgba(201,168,76,0.4)'}
+                  onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}
+                />
+              </div>
+
+              <button
+                type="submit" disabled={isLoading}
+                style={{
+                  width: '100%', padding: '14px', borderRadius: 8, border: 'none',
+                  background: '#C9A84C', color: '#0B1A13', fontWeight: 700, fontSize: 14,
+                  cursor: isLoading ? 'not-allowed' : 'pointer',
+                  opacity: isLoading ? 0.6 : 1,
+                  transition: 'filter 150ms ease, transform 100ms ease',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                  marginTop: 6,
+                }}
+                onMouseEnter={e => { if (!isLoading) e.currentTarget.style.filter = 'brightness(1.1)'; }}
+                onMouseLeave={e => { e.currentTarget.style.filter = 'brightness(1)'; }}
+              >
+                {isLoading ? ( <><Loader2 size={16} className="animate-spin" /> Enrolling Cadet...</> ) : 'Complete Registration & Enter Portal'}
+              </button>
+
+              <div style={{ textAlign: 'center', marginTop: 8 }}>
                 <button
                   type="button"
-                  data-testid="demo-login-admin"
-                  onClick={() => { setEmail('admin@admin.com'); setPassword('password123'); setError(''); }}
-                  style={{
-                    padding: '8px 4px', fontSize: 11, fontWeight: 700, borderRadius: 8,
-                    border: email === 'admin@admin.com' ? '1px solid #C9A84C' : '1px solid rgba(255,255,255,0.1)',
-                    background: email === 'admin@admin.com' ? 'rgba(201,168,76,0.2)' : 'rgba(255,255,255,0.03)',
-                    color: email === 'admin@admin.com' ? '#C9A84C' : 'rgba(245,245,240,0.7)',
-                    cursor: 'pointer', transition: 'all 150ms ease', textAlign: 'center'
-                  }}
+                  onClick={() => { setAuthMode('signin'); setError(''); }}
+                  style={{ background: 'none', border: 'none', color: 'rgba(245,245,240,0.6)', fontSize: 13, cursor: 'pointer', padding: 0 }}
                 >
-                  📋 Admin
-                </button>
-                <button
-                  type="button"
-                  data-testid="demo-login-cadet"
-                  onClick={() => { setEmail('cadet@cadet.com'); setPassword('password123'); setError(''); }}
-                  style={{
-                    padding: '8px 4px', fontSize: 11, fontWeight: 700, borderRadius: 8,
-                    border: email === 'cadet@cadet.com' ? '1px solid #C9A84C' : '1px solid rgba(255,255,255,0.1)',
-                    background: email === 'cadet@cadet.com' ? 'rgba(201,168,76,0.2)' : 'rgba(255,255,255,0.03)',
-                    color: email === 'cadet@cadet.com' ? '#C9A84C' : 'rgba(245,245,240,0.7)',
-                    cursor: 'pointer', transition: 'all 150ms ease', textAlign: 'center'
-                  }}
-                >
-                  🎖️ Cadet
+                  Already registered? <span style={{ color: '#C9A84C', fontWeight: 600, textDecoration: 'underline' }}>Sign In here</span>
                 </button>
               </div>
-            </div>
-
-            {error && (
-              <div data-testid="login-error" style={{ background: 'rgba(248,113,113,0.08)', border: '1px solid rgba(248,113,113,0.15)', color: '#F87171', padding: '10px 14px', borderRadius: 8, fontSize: 13, textAlign: 'center', fontWeight: 500 }}>
-                {error}
-              </div>
-            )}
-
-            <div style={{ position: 'relative' }}>
-              <Mail size={16} style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', color: 'rgba(201,168,76,0.5)' }} />
-              <input
-                data-testid="login-email" type="email" required placeholder="Email address"
-                value={email} onChange={e => setEmail(e.target.value)}
-                style={inputStyle}
-                onFocus={e => e.target.style.borderColor = 'rgba(201,168,76,0.4)'}
-                onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}
-              />
-            </div>
-
-            <div style={{ position: 'relative' }}>
-              <Lock size={16} style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', color: 'rgba(201,168,76,0.5)' }} />
-              <input
-                data-testid="login-password" type="password" required placeholder="Password"
-                value={password} onChange={e => setPassword(e.target.value)}
-                style={inputStyle}
-                onFocus={e => e.target.style.borderColor = 'rgba(201,168,76,0.4)'}
-                onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}
-              />
-            </div>
-            <a href="/forgot-password" style={{ color: 'rgba(201,168,76,0.8)', fontSize: 13, textAlign: 'right', textDecoration: 'none' }}>Forgot password?</a>
-
-            <button
-              data-testid="login-submit" type="submit" disabled={isLoading}
-              style={{
-                width: '100%', padding: '14px', borderRadius: 8, border: 'none',
-                background: '#C9A84C', color: '#0B1A13', fontWeight: 700, fontSize: 14,
-                cursor: isLoading ? 'not-allowed' : 'pointer',
-                opacity: isLoading ? 0.6 : 1,
-                transition: 'filter 150ms ease, transform 100ms ease',
-                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                marginTop: 8,
-              }}
-              onMouseEnter={e => { if (!isLoading) e.currentTarget.style.filter = 'brightness(1.1)'; }}
-              onMouseLeave={e => { e.currentTarget.style.filter = 'brightness(1)'; e.currentTarget.style.transform = 'scale(1)'; }}
-              onMouseDown={e => { if (!isLoading) e.currentTarget.style.transform = 'scale(0.97)'; }}
-              onMouseUp={e => e.currentTarget.style.transform = 'scale(1)'}
-            >
-              {isLoading ? ( <><Loader2 size={16} className="animate-spin" /> Authenticating...</> ) : 'Sign in'}
-            </button>
-          </form>
+            </form>
+          )}
         </motion.div>
       </section>
 

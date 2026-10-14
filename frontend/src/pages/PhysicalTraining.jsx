@@ -1,8 +1,9 @@
 import { useCallback, useContext, useEffect, useState } from 'react';
-import { Check, Eye, RefreshCw, X } from 'lucide-react';
+import { Check, Download, Eye, RefreshCw, X } from 'lucide-react';
 import { AuthContext } from '../context/authStateContext';
 import VideoUpload from '../components/VideoUpload';
 import api from '../services/api';
+import { downloadApiExport } from '../utils/exportUtils';
 
 const displayDate = (value) => {
   if (!value) return '—';
@@ -48,7 +49,7 @@ export default function PhysicalTraining() {
 
   return <div className="mx-auto max-w-6xl space-y-6 pb-10">
     <section className="glass-panel rounded-3xl p-6">
-      <div className="flex flex-wrap items-start justify-between gap-4"><div><p className="text-sm font-semibold uppercase tracking-wider text-gold">Physical training</p><h1 className="mt-1 text-3xl font-bold text-white">{isCadet ? 'Your training evidence' : 'Physical submission review'}</h1><p className="mt-1 text-sm text-white/50">Videos stay in the private Supabase Storage bucket and open only through a short-lived secure link.</p></div><button type="button" onClick={load} className="inline-flex items-center gap-2 rounded-xl border border-white/10 px-4 py-2 text-sm font-semibold text-white/75 hover:bg-white/5"><RefreshCw size={16} />Refresh</button></div>
+      <div className="flex flex-wrap items-start justify-between gap-4"><div><p className="text-sm font-semibold uppercase tracking-wider text-gold">Physical training</p><h1 className="mt-1 text-3xl font-bold text-white">{isCadet ? 'Your training evidence' : 'Physical submission review'}</h1><p className="mt-1 text-sm text-white/50">Videos stay in the private Supabase Storage bucket and open only through a short-lived secure link.</p></div><div className="flex flex-wrap items-center gap-2">{!isCadet && (<button type="button" onClick={() => downloadApiExport('/reports/export/physical', 'delta_squad_physical_training.csv')} className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-white/80 hover:bg-gold/20 hover:text-gold hover:border-gold/30 transition cursor-pointer"><Download size={15} />Export PT CSV</button>)}<button type="button" onClick={load} className="inline-flex items-center gap-2 rounded-xl border border-white/10 px-4 py-2 text-sm font-semibold text-white/75 hover:bg-white/5"><RefreshCw size={16} />Refresh</button></div></div>
     </section>
     {isCadet && <VideoUpload onUploaded={load} />}
     {error && <p className="rounded-xl border border-red-400/20 bg-red-400/10 p-4 text-red-200">{error}</p>}
