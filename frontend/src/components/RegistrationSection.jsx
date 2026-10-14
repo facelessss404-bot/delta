@@ -9,7 +9,6 @@ const PROGRAMS = [
   { id: 'JLP', name: 'Junior Leadership Program (JLP)', desc: 'For students in Classes 8–12 (School Foundation).', icon: GraduationCap },
   { id: 'SLP', name: 'Student Leadership Program (SLP)', desc: 'For graduates targeting officer pre-commissioning.', icon: Users },
   { id: 'SSLP', name: 'Senior Student Leadership Program (SSLP)', desc: 'For online attendees with virtual mentoring.', icon: Shield },
-  { id: 'DAH', name: 'Defence Aspirants Hostel (DAH)', desc: 'Residential & hostel cadet division.', icon: Award },
 ];
 
 const RegistrationSection = () => {
@@ -134,7 +133,7 @@ const RegistrationSection = () => {
         <motion.div 
           role="radiogroup" 
           aria-label="Select Program" 
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4" 
+          className="grid grid-cols-1 md:grid-cols-3" 
           style={{ gap: 24, marginBottom: 64 }}
           initial="hidden"
           whileInView="visible"

@@ -95,7 +95,7 @@ export default function ReportsFull() {
     {
       id: 'cadets',
       name: 'Cadets Master Roster',
-      desc: 'Enrolled cadets, roll numbers, training division (JLP/SLP/YLP/SSLP), attendance %.',
+      desc: 'Enrolled cadets, roll numbers, training division (JLP / SLP / SSLP), attendance %.',
       icon: Users,
       filename: 'delta_squad_cadet_roster.csv'
     },

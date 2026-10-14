@@ -97,7 +97,6 @@ const CADET_CATEGORIES = [
   { id: 'JLP', badge: 'JLP', name: 'Junior Leadership Program', sub: 'Students in Classes 8–12', icon: GraduationCap },
   { id: 'SLP', badge: 'SLP', name: 'Student Leadership Program', sub: 'For Graduates', icon: BookOpen },
   { id: 'SSLP', badge: 'SSLP', name: 'Senior Student Leadership Program', sub: 'Online Attendees', icon: Shield },
-  { id: 'DAH', badge: 'DAH', name: 'Defence Aspirants Hostel', sub: 'Hostel & Residential Cadets', icon: Award },
 ];
 
 /* ─── Main Component ─── */
@@ -575,7 +574,7 @@ const Login = () => {
                     </span>
                     <span style={{ fontSize: 10, color: 'rgba(245,245,240,0.45)' }}>Select batch</span>
                   </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8 }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
                     {CADET_CATEGORIES.map((cat) => {
                       const isSelected = cadetCategory === cat.id;
                       const Icon = cat.icon;
@@ -675,7 +674,7 @@ const Login = () => {
                 <label style={{ display: 'block', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#C9A84C', marginBottom: 6 }}>
                   Select Training Category *
                 </label>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
                   {CADET_CATEGORIES.map((cat) => {
                     const isSelected = cadetCategory === cat.id;
                     const Icon = cat.icon;

@@ -366,7 +366,7 @@ const exportRegistrations = async (req, res) => {
     const result = await pool.query(query);
     const headers = [
       'Reference ID', 'Applicant Name', 'Phone', 'Email',
-      'DOB / Age', 'Education Level', 'Program (JLP/SLP/YLP/SSLP)',
+      'DOB / Age', 'Education Level', 'Program (JLP/SLP/SSLP)',
       'Preferred Mode', 'Additional Notes', 'Submitted Date'
     ];
     const rows = result.rows.map(r => [
