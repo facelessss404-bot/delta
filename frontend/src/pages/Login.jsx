@@ -102,7 +102,6 @@ const CADET_CATEGORIES = [
 /* ─── Main Component ─── */
 const Login = () => {
   const [authMode, setAuthMode] = useState('signin'); // 'signin' | 'signup'
-  const [activeRoleTab, setActiveRoleTab] = useState('cadet'); // 'cadet' | 'commander' | 'admin'
   const [cadetCategory, setCadetCategory] = useState('JLP');
 
   // Sign in fields
@@ -132,8 +131,7 @@ const Login = () => {
     try {
       const payload = {
         email: email.trim(),
-        password,
-        category: activeRoleTab === 'cadet' ? cadetCategory : undefined
+        password
       };
       const { data } = await api.post('/auth/login', payload);
       login(data);
@@ -456,7 +454,7 @@ const Login = () => {
             <button
               type="button"
               data-testid="tab-signup"
-              onClick={() => { setAuthMode('signup'); setActiveRoleTab('cadet'); setError(''); setSignupSuccess(''); }}
+              onClick={() => { setAuthMode('signup'); setError(''); setSignupSuccess(''); }}
               style={{
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
                 padding: '10px 14px', borderRadius: 9, border: 'none', cursor: 'pointer',
@@ -499,116 +497,8 @@ const Login = () => {
               ══════════════════════════════════════ */}
           {authMode === 'signin' && (
             <form onSubmit={handleSignIn} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-              {/* Quick Demo Logins */}
-              <div>
-                <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgba(201,168,76,0.85)', marginBottom: 8, textAlign: 'center' }}>
-                  Select Role / Quick Demo Access
-                </div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 6 }}>
-                  <button
-                    type="button"
-                    data-testid="demo-login-commander"
-                    onClick={() => {
-                      setEmail('commander@commander.com');
-                      setPassword('password123');
-                      setActiveRoleTab('commander');
-                      setError('');
-                    }}
-                    style={{
-                      padding: '8px 4px', fontSize: 11, fontWeight: 700, borderRadius: 8,
-                      border: activeRoleTab === 'commander' ? '1px solid #C9A84C' : '1px solid rgba(255,255,255,0.1)',
-                      background: activeRoleTab === 'commander' ? 'rgba(201,168,76,0.2)' : 'rgba(255,255,255,0.03)',
-                      color: activeRoleTab === 'commander' ? '#C9A84C' : 'rgba(245,245,240,0.7)',
-                      cursor: 'pointer', transition: 'all 150ms ease', textAlign: 'center'
-                    }}
-                  >
-                    🛡️ Commander
-                  </button>
-                  <button
-                    type="button"
-                    data-testid="demo-login-admin"
-                    onClick={() => {
-                      setEmail('admin@admin.com');
-                      setPassword('password123');
-                      setActiveRoleTab('admin');
-                      setError('');
-                    }}
-                    style={{
-                      padding: '8px 4px', fontSize: 11, fontWeight: 700, borderRadius: 8,
-                      border: activeRoleTab === 'admin' ? '1px solid #C9A84C' : '1px solid rgba(255,255,255,0.1)',
-                      background: activeRoleTab === 'admin' ? 'rgba(201,168,76,0.2)' : 'rgba(255,255,255,0.03)',
-                      color: activeRoleTab === 'admin' ? '#C9A84C' : 'rgba(245,245,240,0.7)',
-                      cursor: 'pointer', transition: 'all 150ms ease', textAlign: 'center'
-                    }}
-                  >
-                    📋 Admin
-                  </button>
-                  <button
-                    type="button"
-                    data-testid="demo-login-cadet"
-                    onClick={() => {
-                      setEmail('cadet@cadet.com');
-                      setPassword('password123');
-                      setActiveRoleTab('cadet');
-                      setError('');
-                    }}
-                    style={{
-                      padding: '8px 4px', fontSize: 11, fontWeight: 700, borderRadius: 8,
-                      border: activeRoleTab === 'cadet' ? '1px solid #C9A84C' : '1px solid rgba(255,255,255,0.1)',
-                      background: activeRoleTab === 'cadet' ? 'rgba(201,168,76,0.2)' : 'rgba(255,255,255,0.03)',
-                      color: activeRoleTab === 'cadet' ? '#C9A84C' : 'rgba(245,245,240,0.7)',
-                      cursor: 'pointer', transition: 'all 150ms ease', textAlign: 'center'
-                    }}
-                  >
-                    🎖️ Cadet
-                  </button>
-                </div>
-              </div>
 
-              {/* Cadet Category Selector (Prompted for cadets) */}
-              {activeRoleTab === 'cadet' && (
-                <div style={{ background: 'rgba(0,0,0,0.25)', padding: 12, borderRadius: 12, border: '1px solid rgba(201,168,76,0.2)' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-                    <span style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#C9A84C' }}>
-                      Training Category (Mandatory for Cadets)
-                    </span>
-                    <span style={{ fontSize: 10, color: 'rgba(245,245,240,0.45)' }}>Select batch</span>
-                  </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
-                    {CADET_CATEGORIES.map((cat) => {
-                      const isSelected = cadetCategory === cat.id;
-                      const Icon = cat.icon;
-                      return (
-                        <button
-                          key={cat.id}
-                          type="button"
-                          onClick={() => setCadetCategory(cat.id)}
-                          style={{
-                            display: 'flex', flexDirection: 'column', alignItems: 'flex-start',
-                            padding: '10px 12px', borderRadius: 8, textAlign: 'left',
-                            cursor: 'pointer', transition: 'all 150ms ease',
-                            background: isSelected ? 'rgba(201,168,76,0.18)' : 'rgba(255,255,255,0.03)',
-                            border: isSelected ? '1px solid #C9A84C' : '1px solid rgba(255,255,255,0.08)',
-                          }}
-                        >
-                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', marginBottom: 3 }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                              <Icon size={14} style={{ color: isSelected ? '#C9A84C' : 'rgba(245,245,240,0.6)' }} />
-                              <span style={{ fontSize: 12, fontWeight: 700, color: isSelected ? '#C9A84C' : '#F5F5F0' }}>
-                                {cat.badge}
-                              </span>
-                            </div>
-                            {isSelected && <CheckCircle2 size={13} style={{ color: '#C9A84C' }} />}
-                          </div>
-                          <span style={{ fontSize: 10, color: 'rgba(245,245,240,0.45)', lineHeight: 1.2 }}>
-                            {cat.sub}
-                          </span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
+
 
               <div style={{ position: 'relative' }}>
                 <Mail size={16} style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', color: 'rgba(201,168,76,0.5)' }} />
