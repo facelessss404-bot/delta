@@ -102,6 +102,7 @@ const CADET_CATEGORIES = [
 /* ─── Main Component ─── */
 const Login = () => {
   const [authMode, setAuthMode] = useState('signin'); // 'signin' | 'signup'
+  const [activeRoleTab, setActiveRoleTab] = useState('commander'); // 'commander' | 'admin' | 'cadet'
   const [cadetCategory, setCadetCategory] = useState('JLP');
 
   // Sign in fields
@@ -497,6 +498,71 @@ const Login = () => {
               ══════════════════════════════════════ */}
           {authMode === 'signin' && (
             <form onSubmit={handleSignIn} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              {/* Quick Role Select / 1-Click Access */}
+              <div>
+                <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgba(201,168,76,0.85)', marginBottom: 8, textAlign: 'center' }}>
+                  Quick Role Access (1-Click)
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 6 }}>
+                  <button
+                    type="button"
+                    data-testid="demo-login-commander"
+                    onClick={() => {
+                      setEmail('onlyesan@gmail.com');
+                      setPassword('ESAN@DELTA');
+                      setActiveRoleTab('commander');
+                      setError('');
+                    }}
+                    style={{
+                      padding: '8px 4px', fontSize: 11, fontWeight: 700, borderRadius: 8,
+                      border: activeRoleTab === 'commander' ? '1px solid #C9A84C' : '1px solid rgba(255,255,255,0.1)',
+                      background: activeRoleTab === 'commander' ? 'rgba(201,168,76,0.2)' : 'rgba(255,255,255,0.03)',
+                      color: activeRoleTab === 'commander' ? '#C9A84C' : 'rgba(245,245,240,0.7)',
+                      cursor: 'pointer', transition: 'all 150ms ease', textAlign: 'center'
+                    }}
+                  >
+                    🛡️ Commander
+                  </button>
+                  <button
+                    type="button"
+                    data-testid="demo-login-admin"
+                    onClick={() => {
+                      setEmail('admin@admin.com');
+                      setPassword('password123');
+                      setActiveRoleTab('admin');
+                      setError('');
+                    }}
+                    style={{
+                      padding: '8px 4px', fontSize: 11, fontWeight: 700, borderRadius: 8,
+                      border: activeRoleTab === 'admin' ? '1px solid #C9A84C' : '1px solid rgba(255,255,255,0.1)',
+                      background: activeRoleTab === 'admin' ? 'rgba(201,168,76,0.2)' : 'rgba(255,255,255,0.03)',
+                      color: activeRoleTab === 'admin' ? '#C9A84C' : 'rgba(245,245,240,0.7)',
+                      cursor: 'pointer', transition: 'all 150ms ease', textAlign: 'center'
+                    }}
+                  >
+                    📋 Admin
+                  </button>
+                  <button
+                    type="button"
+                    data-testid="demo-login-cadet"
+                    onClick={() => {
+                      setEmail('cadet@cadet.com');
+                      setPassword('password123');
+                      setActiveRoleTab('cadet');
+                      setError('');
+                    }}
+                    style={{
+                      padding: '8px 4px', fontSize: 11, fontWeight: 700, borderRadius: 8,
+                      border: activeRoleTab === 'cadet' ? '1px solid #C9A84C' : '1px solid rgba(255,255,255,0.1)',
+                      background: activeRoleTab === 'cadet' ? 'rgba(201,168,76,0.2)' : 'rgba(255,255,255,0.03)',
+                      color: activeRoleTab === 'cadet' ? '#C9A84C' : 'rgba(245,245,240,0.7)',
+                      cursor: 'pointer', transition: 'all 150ms ease', textAlign: 'center'
+                    }}
+                  >
+                    🎖️ Cadet
+                  </button>
+                </div>
+              </div>
 
 
 
