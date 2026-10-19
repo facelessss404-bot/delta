@@ -507,7 +507,7 @@ const Login = () => {
                   data-testid="login-email"
                   type="email"
                   required
-                  placeholder="Email address (e.g. onlyesan@gmail.com)"
+                  placeholder="Email address"
                   value={email}
                   onChange={e => setEmail(e.target.value)}
                   style={inputStyle}
