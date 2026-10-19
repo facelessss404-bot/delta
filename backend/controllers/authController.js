@@ -114,8 +114,10 @@ const loginUser = async (req, res) => {
   try {
     const { email, password, category } = req.body;
     if (!email || !password) return res.status(400).json({ message: 'Email and password are required' });
-    const result = await pool.query('SELECT * FROM users WHERE email=$1', [email.toLowerCase().trim()]);
-    if (!result.rows.length || !(await bcrypt.compare(password, result.rows[0].password))) {
+    const cleanEmail = String(email).toLowerCase().trim();
+    const cleanPassword = typeof password === 'string' ? password.trim() : String(password);
+    const result = await pool.query('SELECT * FROM users WHERE email=$1', [cleanEmail]);
+    if (!result.rows.length || !(await bcrypt.compare(cleanPassword, result.rows[0].password))) {
       return res.status(401).json({ message: 'Invalid email or password' });
     }
     const user = result.rows[0];

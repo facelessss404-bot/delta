@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react';
 import { motion, useScroll, useTransform, useInView } from 'framer-motion';
-import { ChevronDown, GraduationCap, BookOpen, Award, Shield, MapPin, Building, Phone, Facebook, Youtube, Mail, Lock, Loader2, User, UserPlus, LogIn as LogInIcon, CheckCircle2, ArrowRight } from 'lucide-react';
+import { ChevronDown, GraduationCap, BookOpen, Award, Shield, MapPin, Building, Phone, Facebook, Youtube, Mail, Lock, Loader2, User, UserPlus, LogIn as LogInIcon, CheckCircle2, ArrowRight, Eye, EyeOff } from 'lucide-react';
 import { AuthContext } from '../context/AuthContext';
 import api from '../services/api';
 import { useNavigate } from 'react-router-dom';
@@ -107,6 +107,7 @@ const Login = () => {
   // Sign in fields
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   // Sign up fields
   const [signupName, setSignupName] = useState('');
@@ -130,8 +131,8 @@ const Login = () => {
     setError('');
     try {
       const payload = {
-        email: email.trim(),
-        password
+        email: email.trim().toLowerCase(),
+        password: password.trim()
       };
       const { data } = await api.post('/auth/login', payload);
       login(data);
@@ -255,7 +256,7 @@ const Login = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 1.35 }}
           >
-            Personnel sign in
+            Commander / Admin / Cadet Sign In
           </motion.a>
         </div>
 
@@ -449,7 +450,7 @@ const Login = () => {
               }}
             >
               <LogInIcon size={15} />
-              Personnel Sign In
+              Commander / Admin / Cadet Sign In
             </button>
             <button
               type="button"
@@ -470,12 +471,12 @@ const Login = () => {
 
           {/* Header */}
           <div style={{ textAlign: 'center', marginBottom: 24 }}>
-            <h2 style={{ fontSize: 22, fontWeight: 800, letterSpacing: '-0.02em', marginBottom: 6, color: '#F5F5F0' }}>
-              {authMode === 'signin' ? 'Command & Cadet Access' : 'Cadet Self-Registration'}
+            <h2 style={{ fontSize: 20, fontWeight: 800, letterSpacing: '-0.02em', marginBottom: 6, color: '#F5F5F0' }}>
+              {authMode === 'signin' ? 'Sign In (Commander / Admin / Cadet)' : 'Cadet Self-Registration'}
             </h2>
             <p style={{ fontSize: 13, color: 'rgba(245,245,240,0.5)', margin: 0 }}>
               {authMode === 'signin'
-                ? 'Sign in to access your division timetable, logs, and portal'
+                ? 'Enter your registered credentials to access Commander Console, Admin Portal, or Cadet Timetable'
                 : 'Enrol yourself directly to avoid manual administrative entry'}
             </p>
           </div>
@@ -493,15 +494,22 @@ const Login = () => {
           )}
 
           {/* ══════════════════════════════════════
-              MODE 1: PERSONNEL SIGN IN
+              MODE 1: COMMANDER / ADMIN / CADET SIGN IN
               ══════════════════════════════════════ */}
           {authMode === 'signin' && (
             <form onSubmit={handleSignIn} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
               <div style={{ position: 'relative' }}>
                 <Mail size={16} style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', color: 'rgba(201,168,76,0.5)' }} />
                 <input
-                  data-testid="login-email" type="email" required placeholder="Email address"
-                  value={email} onChange={e => setEmail(e.target.value)}
+                  id="login-email"
+                  name="email"
+                  autoComplete="username"
+                  data-testid="login-email"
+                  type="email"
+                  required
+                  placeholder="Email address (e.g. onlyesan@gmail.com)"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
                   style={inputStyle}
                   onFocus={e => e.target.style.borderColor = 'rgba(201,168,76,0.4)'}
                   onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}
@@ -511,12 +519,40 @@ const Login = () => {
               <div style={{ position: 'relative' }}>
                 <Lock size={16} style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', color: 'rgba(201,168,76,0.5)' }} />
                 <input
-                  data-testid="login-password" type="password" required placeholder="Password"
-                  value={password} onChange={e => setPassword(e.target.value)}
-                  style={inputStyle}
+                  id="login-password"
+                  name="password"
+                  autoComplete="current-password"
+                  data-testid="login-password"
+                  type={showPassword ? 'text' : 'password'}
+                  required
+                  placeholder="Password"
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                  style={{ ...inputStyle, paddingRight: 44 }}
                   onFocus={e => e.target.style.borderColor = 'rgba(201,168,76,0.4)'}
                   onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  style={{
+                    position: 'absolute',
+                    right: 12,
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    background: 'none',
+                    border: 'none',
+                    color: 'rgba(245,245,240,0.5)',
+                    cursor: 'pointer',
+                    padding: 4,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
               </div>
 
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>

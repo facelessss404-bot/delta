@@ -89,8 +89,9 @@ Follow this step-by-step walkthrough to give the client an impressive, structure
 
 ---
 
-### Step 3: Admin Officer Login (`admin@admin.com`)
-- **URL:** [https://deltasquads.netlify.app/admin](https://deltasquads.netlify.app/admin)
+### Step 3: Admin Officer Portal
+- **Login:** Same unified sign-in panel (`Commander / Admin / Cadet Sign In`) on the homepage.
+- **Account Provisioning:** Admin accounts are created directly by the Commander inside the Commander Console (`/admins`). No dummy or default accounts exist on production.
 - **What to show:**
   1. **Cadet Management:** Roster of cadets with roll numbers (e.g., `DSF-2025-001`), batches (`Alpha Batch 2025-26`), and subject assignment checklist.
   2. **Attendance Actions (`/attendance`):**
