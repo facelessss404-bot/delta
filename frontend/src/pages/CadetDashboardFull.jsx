@@ -150,43 +150,53 @@ export default function CadetDashboardFull() {
               </Link>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-              {todaySchedule.slots.slice(0, 8).map((slot) => {
-                const isNow = slot.start_time && slot.end_time && currentTimeStr >= slot.start_time && currentTimeStr < slot.end_time;
-                return (
-                  <div
-                    key={slot.id}
-                    className={`rounded-2xl border p-3.5 transition ${
-                      isNow
-                        ? 'border-gold bg-gold/20 shadow-lg shadow-gold/15 ring-1 ring-gold text-white'
-                        : 'border-white/10 bg-black/25 text-white/70 hover:bg-white/5'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="text-[11px] font-bold text-gold">
-                        {slot.time_display}
-                      </span>
-                      {isNow && (
-                        <span className="rounded-full bg-emerald-400/20 px-2 py-0.2 text-[9px] font-black uppercase text-emerald-300 animate-pulse">
-                          NOW
+            {todaySchedule.slots.length === 0 ? (
+              <div className="rounded-2xl border border-dashed border-white/15 bg-white/[0.02] p-6 text-center">
+                <p className="text-sm font-semibold text-white/70">
+                  {todaySchedule.dayName === 'Sunday'
+                    ? 'Sunday is an official Academy Rest Day. No academic lectures or drill periods are scheduled today.'
+                    : `No periods scheduled for ${todaySchedule.dayName}.`}
+                </p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                {todaySchedule.slots.slice(0, 8).map((slot) => {
+                  const isNow = slot.start_time && slot.end_time && currentTimeStr >= slot.start_time && currentTimeStr < slot.end_time;
+                  return (
+                    <div
+                      key={slot.id}
+                      className={`rounded-2xl border p-3.5 transition ${
+                        isNow
+                          ? 'border-gold bg-gold/20 shadow-lg shadow-gold/15 ring-1 ring-gold text-white'
+                          : 'border-white/10 bg-black/25 text-white/70 hover:bg-white/5'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="text-[11px] font-bold text-gold">
+                          {slot.time_display}
                         </span>
+                        {isNow && (
+                          <span className="rounded-full bg-emerald-400/20 px-2 py-0.2 text-[9px] font-black uppercase text-emerald-300 animate-pulse">
+                            NOW
+                          </span>
+                        )}
+                      </div>
+                      <p className="font-extrabold text-sm text-white mt-1 line-clamp-1" title={slot.activity}>
+                        {slot.activity}
+                      </p>
+                      {slot.instructor ? (
+                        <p className="text-[11px] text-white/50 mt-0.5 flex items-center gap-1">
+                          <UserCheck size={11} className="text-gold" />
+                          {slot.instructor}
+                        </p>
+                      ) : (
+                        <p className="text-[11px] text-white/40 mt-0.5 italic">Academy Routine</p>
                       )}
                     </div>
-                    <p className="font-extrabold text-sm text-white mt-1 line-clamp-1" title={slot.activity}>
-                      {slot.activity}
-                    </p>
-                    {slot.instructor ? (
-                      <p className="text-[11px] text-white/50 mt-0.5 flex items-center gap-1">
-                        <UserCheck size={11} className="text-gold" />
-                        {slot.instructor}
-                      </p>
-                    ) : (
-                      <p className="text-[11px] text-white/40 mt-0.5 italic">Academy Routine</p>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
+                  );
+                })}
+              </div>
+            )}
           </section>
         )
       )}

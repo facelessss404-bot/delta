@@ -25,7 +25,7 @@ import { AuthContext } from '../context/authStateContext';
 import { getSchedules, getTimetableSlots, getMyTimetable } from '../services/timetableService';
 import { downloadApiExport } from '../utils/exportUtils';
 
-const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
 const CATEGORY_STYLES = {
   academic: {
@@ -77,9 +77,9 @@ export default function Timetable() {
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [viewMode, setViewMode] = useState('day'); // 'day' | 'week'
 
-  // Determine current day of week (1=Mon ... 6=Sat)
-  const currentDayIndex = new Date().getDay();
-  const todayDayName = currentDayIndex >= 1 && currentDayIndex <= 6 ? DAYS[currentDayIndex - 1] : 'Monday';
+  // Determine current day of week (0=Sunday, 1=Monday ... 6=Saturday)
+  const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  const todayDayName = DAY_NAMES[new Date().getDay()];
   const [selectedDay, setSelectedDay] = useState(todayDayName);
 
   const loadData = useCallback(async () => {
@@ -96,19 +96,16 @@ export default function Timetable() {
           setSlots([]);
         } else {
           setOnlineNotice(null);
-          if (myData.schedule?.key) {
-            setSelectedSchedule(myData.schedule.key);
-          }
+          const initialKey = myData.schedule?.key || 'jlp_8_10';
+          setSelectedSchedule(initialKey);
           setSlots(myData.slots || []);
         }
         setActiveLeaveToday(myData.activeLeaveToday);
       } else {
         setOnlineNotice(null);
-        const targetSchedule = selectedSchedule === 'nda' ? (scheduleList[0]?.key || 'jlp_8_10') : selectedSchedule;
-        if (targetSchedule !== selectedSchedule) {
-          setSelectedSchedule(targetSchedule);
-        }
-        const fetchedSlots = await getTimetableSlots({ scheduleKey: targetSchedule });
+        const defaultKey = scheduleList[0]?.key || 'jlp_8_10';
+        setSelectedSchedule(defaultKey);
+        const fetchedSlots = await getTimetableSlots({ scheduleKey: defaultKey });
         setSlots(fetchedSlots);
       }
     } catch (err) {
@@ -116,7 +113,7 @@ export default function Timetable() {
     } finally {
       setLoading(false);
     }
-  }, [isCadet, selectedSchedule]);
+  }, [isCadet]);
 
   useEffect(() => {
     loadData();
@@ -127,9 +124,21 @@ export default function Timetable() {
     setSelectedSchedule(key);
     setOnlineNotice(null);
     setLoading(true);
+    setError('');
     try {
-      const fetchedSlots = await getTimetableSlots({ scheduleKey: key });
-      setSlots(fetchedSlots);
+      if (isCadet) {
+        const myData = await getMyTimetable(key);
+        if (myData.isOnline) {
+          setOnlineNotice(myData.message || 'No timetable is required for SSLP (Online Attendees). All training sessions are conducted virtually.');
+          setSlots([]);
+        } else {
+          setOnlineNotice(null);
+          setSlots(myData.slots || []);
+        }
+      } else {
+        const fetchedSlots = await getTimetableSlots({ scheduleKey: key });
+        setSlots(fetchedSlots);
+      }
     } catch (err) {
       setError(err.response?.data?.message || 'Unable to load slots for this schedule.');
     } finally {
@@ -397,11 +406,23 @@ export default function Timetable() {
           </div>
         </div>
       ) : filteredSlots.length === 0 ? (
-        <div className="glass-panel flex min-h-[250px] flex-col items-center justify-center rounded-3xl p-10 text-center">
-          <CalendarDays className="text-white/20 mb-3" size={42} />
-          <h3 className="text-lg font-bold text-white">No sessions matched</h3>
-          <p className="mt-1 text-sm text-white/50">Try clearing filters or search query.</p>
-        </div>
+        selectedDay === 'Sunday' ? (
+          <div className="glass-panel flex min-h-[260px] flex-col items-center justify-center rounded-3xl p-10 text-center border border-white/10 bg-white/[0.02]">
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gold/10 border border-gold/30 text-gold mb-3 shadow-lg shadow-gold/5">
+              <CalendarCheck size={28} />
+            </div>
+            <h3 className="text-xl font-bold text-white">Sunday — Academy Routine Off / Rest Day</h3>
+            <p className="mt-2 text-sm text-white/50 max-w-lg leading-relaxed">
+              Sunday is designated as an official cadet rest & maintenance day with a blank routine. No academic lectures, training periods, or roll-call sessions are scheduled.
+            </p>
+          </div>
+        ) : (
+          <div className="glass-panel flex min-h-[250px] flex-col items-center justify-center rounded-3xl p-10 text-center">
+            <CalendarDays className="text-white/20 mb-3" size={42} />
+            <h3 className="text-lg font-bold text-white">No sessions matched</h3>
+            <p className="mt-1 text-sm text-white/50">Try clearing filters or search query.</p>
+          </div>
+        )
       ) : viewMode === 'day' ? (
         /* Day Timeline View */
         <div className="space-y-3">
@@ -507,7 +528,7 @@ export default function Timetable() {
               <h2 className="font-bold text-white text-base">
                 Weekly Timetable Matrix · {activeScheduleMeta?.title}
               </h2>
-              <span className="text-xs text-gold">6 Days / 19 Daily Periods</span>
+              <span className="text-xs text-gold">7 Days (Mon–Sun) / 19 Daily Periods</span>
             </div>
 
             <div className="space-y-6 divide-y divide-white/10">
@@ -526,33 +547,45 @@ export default function Timetable() {
                         </span>
                       )}
                     </div>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
-                      {daySlots.map((s) => {
-                        const cat = CATEGORY_STYLES[s.category] || CATEGORY_STYLES.academic;
-                        return (
-                          <div
-                            key={s.id}
-                            className={`rounded-xl border p-2.5 text-left text-xs transition ${
-                              isCurrentSlot(s)
-                                ? 'border-gold bg-gold/20 text-white ring-1 ring-gold'
-                                : 'border-white/10 bg-black/20 text-white/70 hover:bg-white/5'
-                            }`}
-                          >
-                            <span className="text-[10px] font-semibold text-white/40 block">
-                              {s.time_display}
-                            </span>
-                            <span className="font-bold text-white block mt-0.5 truncate" title={s.activity}>
-                              {s.activity}
-                            </span>
-                            {s.instructor && (
-                              <span className="text-[10px] text-gold/80 block mt-0.5 truncate">
-                                {s.instructor}
+                    {day === 'Sunday' ? (
+                      <div className="rounded-2xl border border-dashed border-white/15 bg-white/[0.02] p-6 text-center flex flex-col items-center justify-center min-h-[90px]">
+                        <p className="text-xs font-semibold text-white/40 uppercase tracking-wider">
+                          Sunday Academy Rest Day — Blank Routine (No Scheduled Periods)
+                        </p>
+                      </div>
+                    ) : daySlots.length === 0 ? (
+                      <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4 text-left text-xs text-white/40">
+                        No periods scheduled for {day}
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
+                        {daySlots.map((s) => {
+                          const cat = CATEGORY_STYLES[s.category] || CATEGORY_STYLES.academic;
+                          return (
+                            <div
+                              key={s.id}
+                              className={`rounded-xl border p-2.5 text-left text-xs transition ${
+                                isCurrentSlot(s)
+                                  ? 'border-gold bg-gold/20 text-white ring-1 ring-gold'
+                                  : 'border-white/10 bg-black/20 text-white/70 hover:bg-white/5'
+                              }`}
+                            >
+                              <span className="text-[10px] font-semibold text-white/40 block">
+                                {s.time_display}
                               </span>
-                            )}
-                          </div>
-                        );
-                      })}
-                    </div>
+                              <span className="font-bold text-white block mt-0.5 truncate" title={s.activity}>
+                                {s.activity}
+                              </span>
+                              {s.instructor && (
+                                <span className="text-[10px] text-gold/80 block mt-0.5 truncate">
+                                  {s.instructor}
+                                </span>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
                   </div>
                 );
               })}

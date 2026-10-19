@@ -49,7 +49,7 @@ async function runVerification() {
     const cmdLoginRes = await fetch(`${baseUrl}/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: 'commander@commander.com', password: 'password123' })
+      body: JSON.stringify({ email: 'onlyesan@gmail.com', password: 'ESAN@DELTA' })
     });
     const cmdToken = (await cmdLoginRes.json()).token;
 

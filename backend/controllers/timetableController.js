@@ -7,12 +7,11 @@ const SCHEDULE_META = [
   { key: 'slp', title: 'SLP: Graduates', programme: 'SLP', description: 'Student Leadership Program: Graduate degree holders, CDS/SSB officer coaching & physicals' }
 ];
 
-const mapProgrammeToKey = (programme) => {
-  if (!programme) return 'jlp_8_10';
-  const p = programme.toUpperCase();
-  if (p === 'SLP' || p.includes('GRADUATE')) return 'slp';
-  if (p === 'SSLP' || p.includes('ONLINE')) return 'sslp_online';
-  if (p.includes('11') || p.includes('12')) return 'jlp_11_12';
+const mapProgrammeToKey = (programme, batch = '') => {
+  const combined = `${programme || ''} ${batch || ''}`.toUpperCase();
+  if (combined.includes('SLP') || combined.includes('GRADUATE')) return 'slp';
+  if (combined.includes('SSLP') || combined.includes('ONLINE')) return 'sslp_online';
+  if (combined.includes('11') || combined.includes('12') || combined.includes('HIGHER')) return 'jlp_11_12';
   return 'jlp_8_10';
 };
 
@@ -78,7 +77,8 @@ const getTimetableSlots = async (req, res) => {
         WHEN 'Thursday' THEN 4
         WHEN 'Friday' THEN 5
         WHEN 'Saturday' THEN 6
-        ELSE 7
+        WHEN 'Sunday' THEN 7
+        ELSE 8
       END,
       t.slot_order ASC
     `;
@@ -101,7 +101,7 @@ const getMyTimetable = async (req, res) => {
     );
     const profile = profileRes.rows[0] || {};
     const requestedKey = req.query.scheduleKey;
-    const computedKey = requestedKey || mapProgrammeToKey(profile.programme);
+    const computedKey = requestedKey || mapProgrammeToKey(profile.programme, profile.batch);
 
     // SSLP is for online attendees — no timetable required
     if (computedKey === 'sslp_online' || profile.programme === 'SSLP' || profile.programme?.toLowerCase().includes('online')) {
@@ -153,7 +153,8 @@ const getMyTimetable = async (req, res) => {
           WHEN 'Thursday' THEN 4
           WHEN 'Friday' THEN 5
           WHEN 'Saturday' THEN 6
-          ELSE 7
+          WHEN 'Sunday' THEN 7
+          ELSE 8
         END,
         t.slot_order ASC
     `, [targetKey]);

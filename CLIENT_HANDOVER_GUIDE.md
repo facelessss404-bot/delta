@@ -13,7 +13,7 @@ All demo accounts are pre-loaded in the live database with password **`password1
 
 | Role | Email Login | Password | Primary Responsibilities |
 | :--- | :--- | :--- | :--- |
-| **Training Commander** *(Super Admin)* | `commander@commander.com` | `password123` | Top-level command operations, creating & managing Admin accounts, reviewing physical drills, approving cadet leaves, full audit logs, operational reports. |
+| **Training Commander** *(Super Admin)* | `onlyesan@gmail.com` | `ESAN@DELTA` | Top-level command operations, creating & managing Admin accounts, reviewing physical drills, approving cadet leaves, full audit logs, operational reports. |
 | **Admin Officer** *(Operations / Instructor)* | `admin@admin.com` | `password123` | Creating cadets, assigning subject batches, conducting attendance sessions, recording assessment marks, reviewing leaves, posting notices, uploading training notes. *(Cannot manage Admin accounts)* |
 | **Cadet** *(Student Aspirant)* | `cadet@cadet.com` | `password123` | Student portal for Cadet Rohan Sharma. Views individual attendance %, academic marks, exam results, approved leaves, downloaded notes, and uploads physical training video evidence. |
 
@@ -75,8 +75,9 @@ Follow this step-by-step walkthrough to give the client an impressive, structure
 
 ---
 
-### Step 2: Training Commander Login (`commander@commander.com`)
+### Step 2: Training Commander Login (`onlyesan@gmail.com`)
 - **URL:** [https://deltasquads.netlify.app/commander](https://deltasquads.netlify.app/commander)
+- **Password:** `ESAN@DELTA`
 - **What to show:**
   1. **Command Dashboard:** Live metrics tiles (Total Cadets: 6, Active Admins: 1, Overall Attendance: 84.6%, Pending Reviews: 2).
   2. **Alerts & Exceptions Banner:** Automatically highlights actionable items:

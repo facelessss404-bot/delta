@@ -26,7 +26,7 @@ import leaveService from '../services/leaveService';
 
 const today = () => new Date().toISOString().slice(0, 10);
 const sessionTypes = ['class', 'drill', 'physical training', 'assessment', 'other'];
-const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
 export default function AttendancePanel() {
   const [searchParams] = useSearchParams();
